@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -21,18 +22,11 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────
-# In production the frontend is served from Vercel on a different origin.
-import os
-
-_allowed_origins = os.environ.get(
-    "CORS_ORIGINS",
-    "http://localhost:6052,http://localhost:5173,http://127.0.0.1:6052",
-).split(",")
-
+# Allow all origins for now — tighten in production if needed.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
