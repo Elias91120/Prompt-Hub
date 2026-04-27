@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Sparkles, Code2, Target, Zap, Activity } from 'lucide-react'
+import { ArrowRight, Sparkles, Code2, Target, Zap, Activity, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react'
 import type { Project, ProjectRecap } from '../types'
 import { getProject, getProjectRecap } from '../api'
 import AppShell from '../components/layout/AppShell'
@@ -52,6 +52,11 @@ export default function ProjectOverviewPage({
   const [loadError, setLoadError] = useState<unknown>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'dashboard' | 'config'>('dashboard')
+  
+  const stats = useMemo(() => (project ? computeStats(project) : null), [project])
+  const hasPlan = stats ? stats.phaseCount > 0 : false
+  
+  const [chatExpanded, setChatExpanded] = useState(!hasPlan)
 
   // AI Recap State
   const [recap, setRecap] = useState<ProjectRecap | null>(null)
@@ -71,9 +76,6 @@ export default function ProjectOverviewPage({
       })
     return () => { active = false }
   }, [projectId, initialProject])
-
-  const stats = useMemo(() => (project ? computeStats(project) : null), [project])
-  const hasPlan = stats ? stats.phaseCount > 0 : false
 
   async function handleLoadRecap() {
     setRecapLoading(true)
@@ -260,29 +262,49 @@ export default function ProjectOverviewPage({
               </div>
             </div>
 
-            {/* RIGHT COLUMN: AI Workspace (Chat) - COMPACT HEIGHT */}
+            {/* RIGHT COLUMN: AI Workspace (Chat) - COLLAPSIBLE */}
             <div className="lg:col-span-8">
-              <div className="glass-card flex min-h-[480px] flex-col overflow-hidden" id="workspace" style={{ padding: 0 }}>
-                <div className="flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-3">
+              <div className={`glass-card flex flex-col overflow-hidden transition-all duration-300 ${chatExpanded ? 'min-h-[480px]' : 'min-h-0'}`} id="workspace" style={{ padding: 0 }}>
+                <div 
+                  className="flex cursor-pointer items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-3 transition-colors hover:bg-[var(--color-surface-hover)]"
+                  onClick={() => setChatExpanded(!chatExpanded)}
+                >
                   <div className="flex items-center gap-3">
                     <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-accent)]/20">
-                      <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                      {chatExpanded ? (
+                        <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                      ) : (
+                        <MessageSquare className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+                      )}
                     </div>
                     <div>
-                      <h2 className="text-xs font-bold text-[var(--color-text-primary)]">Atelier IA</h2>
+                      <h2 className="text-xs font-bold text-[var(--color-text-primary)]">
+                        Atelier IA
+                        {!chatExpanded && (
+                          <span className="ml-2 text-[10px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">
+                            — Cliquez pour agrandir
+                          </span>
+                        )}
+                      </h2>
                     </div>
                   </div>
+                  <div className="text-[var(--color-text-tertiary)]">
+                     {chatExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </div>
                 </div>
-                <div className="flex-1 bg-[var(--color-surface)] relative">
-                  <AIWorkspace
-                    projectId={projectId}
-                    project={project}
-                    hasPlan={hasPlan}
-                    onProjectUpdated={setProject}
-                    onOpenPlan={() => onOpenPlan(project)}
-                    minimal={true}
-                  />
-                </div>
+                
+                {chatExpanded && (
+                  <div className="flex-1 bg-[var(--color-surface)] relative animate-in fade-in slide-in-from-top-2 duration-300">
+                    <AIWorkspace
+                      projectId={projectId}
+                      project={project}
+                      hasPlan={hasPlan}
+                      onProjectUpdated={setProject}
+                      onOpenPlan={() => onOpenPlan(project)}
+                      minimal={true}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
