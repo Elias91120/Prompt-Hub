@@ -260,7 +260,7 @@ function ChatTab({
       </ExplainBanner>
 
       {/* ChatPanel needs a bounded height because its inner scroller uses h-full */}
-      <div className="flex flex-col" style={{ height: '560px' }}>
+      <div className="flex flex-col" style={{ height: '480px' }}>
         <ChatPanel
           key={projectId + ':' + (hasPlan ? 'plan' : 'noplan')}
           projectId={projectId}

@@ -56,7 +56,18 @@ export default function ProjectOverviewPage({
   const stats = useMemo(() => (project ? computeStats(project) : null), [project])
   const hasPlan = stats ? stats.phaseCount > 0 : false
   
-  const [chatExpanded, setChatExpanded] = useState(!hasPlan)
+  const [chatExpanded, setChatExpanded] = useState(false)
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false)
+
+  // Auto-expand AI workspace only if project has no plan
+  useEffect(() => {
+    if (project && stats && !hasAutoExpanded) {
+      if (stats.phaseCount === 0) {
+        setChatExpanded(true)
+      }
+      setHasAutoExpanded(true)
+    }
+  }, [project, stats, hasAutoExpanded])
 
   // AI Recap State
   const [recap, setRecap] = useState<ProjectRecap | null>(null)
