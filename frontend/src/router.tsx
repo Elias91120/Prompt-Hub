@@ -104,10 +104,12 @@ function PlanRoute() {
 export const router = createBrowserRouter([
   { path: '/', element: withSuspense(<HomeRoute />) },
   { path: '/projects/:projectId', element: withSuspense(<OverviewRoute />) },
-  { path: '/projects/:projectId/plan', element: withSuspense(<PlanRoute />) },
   {
-    path: '/projects/:projectId/plan/steps/:stepId',
+    path: '/projects/:projectId/plan',
     element: withSuspense(<PlanRoute />),
+    children: [
+      { path: 'steps/:stepId', element: null },
+    ],
   },
   { path: '*', element: <Navigate to="/" replace /> },
 ])

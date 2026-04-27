@@ -45,7 +45,6 @@ export default function PlanPage({
    * Components inside the page keep using `setSelectedStep` exactly as before.
    */
   const setSelectedStep = (s: Step | null) => {
-    setSelectedStepInternal(s)
     onSelectStep?.(s ? s.id : null)
   }
   // "Discuter de ce step": when set, the next chat message is sent with
