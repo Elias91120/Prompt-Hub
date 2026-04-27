@@ -30,16 +30,19 @@ export default function Footer() {
             {t('footer.links.projects')}
           </a>
         </div>
-        <div className="flex items-center gap-1.5 text-[var(--color-text-tertiary)]">
-          <span>© {new Date().getFullYear()}</span>
-          <a
-            href="https://web-gen-lyart.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]"
-          >
-            Webgen
-          </a>
+        <div className="flex flex-col items-center gap-1.5 text-[var(--color-text-secondary)] sm:items-end">
+          <div className="flex items-center gap-2">
+            <span>Développé avec passion par</span>
+            <a
+              href="https://web-gen-lyart.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-webgen flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold tracking-wide transition-all"
+            >
+              Webgen
+            </a>
+          </div>
+          <span className="text-[10px] text-[var(--color-text-tertiary)]">© {new Date().getFullYear()} Prompt Hub. Tous droits réservés.</span>
         </div>
       </div>
     </footer>

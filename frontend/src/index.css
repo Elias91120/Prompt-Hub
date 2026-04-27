@@ -313,6 +313,18 @@ body {
     background: var(--color-surface-hover);
     color: var(--color-text-primary);
   }
+  .btn-webgen {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+  .btn-webgen:hover {
+    background: linear-gradient(135deg, rgba(62, 207, 142, 0.1), rgba(62, 207, 142, 0.02));
+    border-color: rgba(62, 207, 142, 0.3);
+    box-shadow: 0 4px 20px rgba(62, 207, 142, 0.15);
+    transform: translateY(-1px);
+  }
   .icon-btn {
     display: inline-flex;
     align-items: center;

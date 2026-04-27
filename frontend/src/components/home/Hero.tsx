@@ -21,10 +21,16 @@ export default function Hero({ onCreate, onScrollToProjects }: Props) {
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center text-center"
         >
-          <span className="eyebrow mb-5">
-            <Sparkles className="h-3 w-3" />
-            {t('hero.eyebrow')}
-          </span>
+          <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <span className="eyebrow">
+              <Sparkles className="h-3 w-3" />
+              {t('hero.eyebrow')}
+            </span>
+            <span className="hidden h-4 w-px bg-[var(--color-border)] sm:block" />
+            <a href="https://web-gen-lyart.vercel.app" target="_blank" rel="noopener noreferrer" className="btn-webgen flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-all">
+              Développé par Webgen
+            </a>
+          </div>
 
           <h1 className="text-balance text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl">
             {t('hero.title1')}{' '}

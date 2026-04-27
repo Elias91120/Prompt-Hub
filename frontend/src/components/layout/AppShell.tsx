@@ -40,6 +40,15 @@ export default function AppShell({
       </a>
       <PageBackground />
 
+      {/* Beta Banner */}
+      <div className="bg-gradient-to-r from-[var(--color-surface)] via-[#15803d] to-[var(--color-surface)] px-4 py-2 text-center text-xs font-medium tracking-wide text-white shadow-md sm:text-sm">
+        <span className="mr-2 inline-block rounded-md bg-white/20 px-2 py-0.5 uppercase">Beta</span>
+        Environnement de test partagé. Ne pas entrer de données sensibles.
+        <span className="ml-2 hidden sm:inline text-white/70">
+          • Développé avec passion par <strong className="text-white">Webgen</strong>
+        </span>
+      </div>
+
       <header
         className={
           transparentTopBar

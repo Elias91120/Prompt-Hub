@@ -69,6 +69,21 @@ export default function ProjectsSection({
           </button>
         </div>
 
+        <div className="mb-8 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-[var(--color-text-secondary)] shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+              <Sparkles className="h-3 w-3" />
+            </div>
+            <div>
+              <strong className="text-emerald-400">Mode Beta - Compte partagé</strong>
+              <p className="mt-1">
+                Afin de faciliter les tests et de recueillir vos avis, Prompt Hub est actuellement en accès libre sans création de compte. 
+                <strong className="text-[var(--color-text-primary)]"> Tous les projets créés ici sont visibles par l'ensemble des testeurs.</strong> Merci de ne pas inclure de données confidentielles ou sensibles.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {error && (
           <ErrorBanner
             className="mb-6"
@@ -221,20 +236,35 @@ function ProjectCard({
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   const { t } = useTranslation('home')
   return (
-    <div className="glass-card flex flex-col items-center justify-center px-6 py-16 text-center">
-      <span className="kpi-icon mb-4 h-12 w-12">
-        <FolderOpen className="h-5 w-5" />
-      </span>
-      <h3 className="text-base font-semibold text-[var(--color-text-primary)]">
-        {t('projects.empty.title')}
-      </h3>
-      <p className="mt-2 max-w-sm text-sm text-[var(--color-text-secondary)]">
-        {t('projects.empty.description')}
-      </p>
-      <button onClick={onCreate} className="btn-primary mt-6">
-        <FolderPlus className="h-4 w-4" />
-        {t('projects.empty.cta')}
-      </button>
+    <div className="glass-card flex flex-col items-center justify-center overflow-hidden px-6 py-16 text-center relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--color-surface)]/50 pointer-events-none" />
+      <div className="relative z-10 flex flex-col items-center">
+        <span className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--color-accent)]/20 to-emerald-500/10 shadow-inner ring-1 ring-inset ring-[var(--color-accent)]/20">
+          <FolderOpen className="h-8 w-8 text-[var(--color-accent)]" />
+        </span>
+        <h3 className="text-xl font-bold text-[var(--color-text-primary)]">
+          {t('projects.empty.title')}
+        </h3>
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-[var(--color-text-secondary)]">
+          {t('projects.empty.description')}
+        </p>
+        
+        <div className="mt-8 grid max-w-lg gap-4 text-left sm:grid-cols-2">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/50 p-4">
+            <h4 className="text-sm font-semibold text-emerald-400">1. Décrivez</h4>
+            <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">Donnez le contexte et l'objectif de votre projet.</p>
+          </div>
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/50 p-4">
+            <h4 className="text-sm font-semibold text-emerald-400">2. L'IA structure</h4>
+            <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">Génération d'un plan détaillé en phases et étapes.</p>
+          </div>
+        </div>
+
+        <button onClick={onCreate} className="btn-primary mt-8 px-8 py-3 text-base shadow-xl shadow-[var(--color-accent)]/10 hover:shadow-[var(--color-accent)]/20">
+          <Sparkles className="h-5 w-5" />
+          {t('projects.empty.cta')}
+        </button>
+      </div>
     </div>
   )
 }
