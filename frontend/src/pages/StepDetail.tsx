@@ -201,7 +201,10 @@ export default function StepDetail({
       {/* Overlay (click to close) */}
       <div
         className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-opacity"
-        onClick={onClose}
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
         aria-hidden="true"
       />
       <aside
