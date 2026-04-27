@@ -129,11 +129,16 @@ export default function ChatPanel({
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(true)
   const [readyToPlan, setReadyToPlan] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
   }, [messages])
 
   // Load persisted history first; only fall back to a synthetic "Start"
@@ -153,21 +158,17 @@ export default function ChatPanel({
           return
         }
         try {
-          // Stream the initial greeting so first paint feels snappy.
-          setMessages([{ role: 'agent', content: '' }])
-          let raw = ''
-          const res = await chatMessageStream(projectId, 'Start', [], {
-            onToken: (chunk) => {
-              raw += chunk
-              const live = extractLiveMessage(raw)
-              if (live) {
-                setMessages([{ role: 'agent', content: live }])
-              }
+          // Instead of an expensive LLM call on mount, we use a static greeting.
+          // This avoids layout jumps and unnecessary token costs when opening a project.
+          setMessages([
+            {
+              role: 'agent',
+              content: t('chat.defaultGreeting', { 
+                defaultValue: "Bonjour ! Que souhaitez-vous modifier dans le plan de votre projet ?" 
+              }),
             },
-          })
-          if (cancelled) return
-          setMessages([{ role: 'agent', content: res.reply }])
-          setReadyToPlan(res.ready_to_plan)
+          ])
+          setReadyToPlan(true)
         } finally {
           if (!cancelled) setSending(false)
         }
@@ -315,7 +316,7 @@ export default function ChatPanel({
   return (
     <div className="flex h-full flex-col">
       {/* ── Messages ── */}
-      <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
         {messages.length === 0 && (
           <div className="mx-auto mt-6 max-w-sm rounded-2xl border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]/40 p-5 text-center">
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent-glow)]">
@@ -421,8 +422,6 @@ export default function ChatPanel({
             </div>
           </div>
         )}
-
-        <div ref={bottomRef} />
       </div>
 
       {/* ── Generate Plan CTA ── */}

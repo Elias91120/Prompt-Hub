@@ -7,6 +7,8 @@ import AppShell from '../components/layout/AppShell'
 import AIWorkspace from '../components/AIWorkspace'
 import { ErrorBanner, Skeleton } from '../components/ui'
 
+import ProjectSettingsModal from '../components/ProjectSettingsModal'
+
 interface Props {
   projectId: string
   /** Initial project data (may be slightly stale). Page refetches in background.
@@ -111,6 +113,7 @@ export default function ProjectOverviewPage({
   const [recap, setRecap] = useState<ProjectRecap | null>(null)
   const [recapLoading, setRecapLoading] = useState(false)
   const [recapError, setRecapError] = useState<string | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // Refresh project data in the background so stats are accurate.
   useEffect(() => {
@@ -352,14 +355,41 @@ export default function ProjectOverviewPage({
         </section>
 
         {/* ── Project facts ── */}
-        <section className="mt-6 grid gap-6 lg:grid-cols-2">
-          <FactCard title="Constraints" content={project.constraints} />
-          <FactCard title="Stack" content={project.stack} />
-          <FactCard
-            title="Decisions log"
-            content={project.decisions_log}
-            className="lg:col-span-2"
-          />
+        <section className="mt-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                Project Settings & Facts
+              </h2>
+              <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">
+                Règles du projet, palette de couleurs, stack technique et contraintes globales.
+              </p>
+            </div>
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)] shadow-sm transition-all hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M13.5 2.5a2.121 2.121 0 0 1 0 3L6 13l-4 1 1-4 7.5-7.5a2.121 2.121 0 0 1 3 0z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Modifier les paramètres
+            </button>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <FactCard title="Constraints" content={project.constraints} />
+            <FactCard title="Stack" content={project.stack} />
+            <FactCard
+              title="Règles / Palette / Décisions techniques"
+              content={project.decisions_log}
+              className="lg:col-span-2"
+            />
+          </div>
         </section>
 
         {/* ── Phase / step breakdown ── */}
@@ -457,6 +487,15 @@ export default function ProjectOverviewPage({
           </button>
         </div>
       </div>
+      
+      {project && (
+        <ProjectSettingsModal
+          project={project}
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          onProjectUpdated={(p) => setProject(p)}
+        />
+      )}
     </AppShell>
   )
 }

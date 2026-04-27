@@ -191,7 +191,7 @@ function PlanGraphInner({ project, selectedStepId, onSelectStep, flashStepNames 
       elementsSelectable
       panOnScroll
       panOnDrag
-      zoomOnScroll
+      zoomOnScroll={false}
       zoomOnPinch
       selectionOnDrag={false}
     >
