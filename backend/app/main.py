@@ -3,8 +3,8 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.db import init_db
 from app.routes import agents_router, projects_router
@@ -25,26 +25,35 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ── CORS ─────────────────────────────────────────────────────────────────
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+# ── CORS via custom middleware ───────────────────────────────────────────
+# Using a custom middleware instead of CORSMiddleware to guarantee CORS
+# headers are present on ALL responses, including unhandled exceptions.
+
+class CORSEverythingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Handle preflight
+        if request.method == "OPTIONS":
+            response = JSONResponse(content={}, status_code=200)
+        else:
+            try:
+                response = await call_next(request)
+            except Exception as exc:
+                logger.error("Unhandled error: %s", exc, exc_info=True)
+                response = JSONResponse(
+                    status_code=500,
+                    content={"detail": "Internal server error"},
+                )
+
+        # Add CORS headers to EVERY response
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Max-Age"] = "600"
+        return response
 
 
-# ── Global exception handler ────────────────────────────────────────────
-# Ensures CORS headers are present even on unhandled errors (500).
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error("Unhandled error: %s", exc, exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"},
-    )
-
+app.add_middleware(CORSEverythingMiddleware)
 
 app.include_router(projects_router)
 app.include_router(agents_router)
