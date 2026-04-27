@@ -88,8 +88,18 @@ export default function PlanPage({
   // the project is loaded. Walks both top-level steps and sub-steps.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (!project || !selectedStepId) return
+    if (!project) return
+
+    // Case: URL has no step id (e.g. /plan) -> clear drawer state
+    if (!selectedStepId) {
+      if (selectedStep) setSelectedStepInternal(null)
+      return
+    }
+
+    // Case: URL step id is already reflected in state -> do nothing
     if (selectedStep?.id === selectedStepId) return
+
+    // Case: URL step id needs to be resolved from project data
     for (const ph of project.phases) {
       for (const s of ph.steps) {
         if (s.id === selectedStepId) {
