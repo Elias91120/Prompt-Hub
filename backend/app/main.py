@@ -1,11 +1,15 @@
 import os
+import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.db import init_db
 from app.routes import agents_router, projects_router
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -22,7 +26,6 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────
-# Allow all origins for now — tighten in production if needed.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,6 +33,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Global exception handler ────────────────────────────────────────────
+# Ensures CORS headers are present even on unhandled errors (500).
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error("Unhandled error: %s", exc, exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
+
 
 app.include_router(projects_router)
 app.include_router(agents_router)
