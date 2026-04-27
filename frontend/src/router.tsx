@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { lazy, Suspense, useCallback } from 'react'
+import { Suspense, useCallback } from 'react'
 import {
   createBrowserRouter,
   Navigate,
@@ -16,9 +16,17 @@ import type { Project } from './types'
  * etc. The Suspense boundary shows a centered spinner while a chunk
  * is being fetched.
  */
-const HomePage = lazy(() => import('./pages/HomePage'))
-const ProjectOverviewPage = lazy(() => import('./pages/ProjectOverviewPage'))
-const PlanPage = lazy(() => import('./pages/PlanPage'))
+import { lazyRetry } from './lib/lazy'
+
+/**
+ * Each page is loaded on demand. This keeps the initial bundle small —
+ * the home page no longer ships React Flow, the heavy chat panel,
+ * etc. The Suspense boundary shows a centered spinner while a chunk
+ * is being fetched.
+ */
+const HomePage = lazyRetry(() => import('./pages/HomePage'))
+const ProjectOverviewPage = lazyRetry(() => import('./pages/ProjectOverviewPage'))
+const PlanPage = lazyRetry(() => import('./pages/PlanPage'))
 
 function PageFallback() {
   return (

@@ -1,20 +1,21 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import type { Phase, Project, Step } from '../types'
 import { generatePlan, getProject } from '../api'
 import PlanGraph from '../components/PlanGraph/PlanGraph'
 import { ErrorBanner, Skeleton, Spinner, Breadcrumbs, useToast } from '../components/ui'
 import { friendlyMessage } from '../lib/errors'
+import { lazyRetry } from '../lib/lazy'
 
 // Side panels and step detail are only opened on demand. Lazy-loading them
 // keeps the initial Plan view lighter (chart, sparkline icons, skills CRUD,
 // audit log don't ship until the user actually opens the corresponding
 // drawer).
-const ChatPanel = lazy(() => import('../components/ChatPanel'))
-const SkillsPanel = lazy(() => import('../components/SkillsPanel'))
-const TimelinePanel = lazy(() => import('../components/TimelinePanel'))
-const InsightsPanel = lazy(() => import('../components/InsightsPanel'))
-const StepDetail = lazy(() => import('./StepDetail'))
+const ChatPanel = lazyRetry(() => import('../components/ChatPanel'))
+const SkillsPanel = lazyRetry(() => import('../components/SkillsPanel'))
+const TimelinePanel = lazyRetry(() => import('../components/TimelinePanel'))
+const InsightsPanel = lazyRetry(() => import('../components/InsightsPanel'))
+const StepDetail = lazyRetry(() => import('./StepDetail'))
 
 interface Props {
   projectId: string
