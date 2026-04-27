@@ -39,10 +39,10 @@ class CORSEverythingMiddleware(BaseHTTPMiddleware):
             try:
                 response = await call_next(request)
             except Exception as exc:
-                logger.error("Unhandled error: %s", exc, exc_info=True)
+                logger.error("Unhandled error on %s %s: %s", request.method, request.url.path, exc, exc_info=True)
                 response = JSONResponse(
                     status_code=500,
-                    content={"detail": "Internal server error"},
+                    content={"detail": f"{type(exc).__name__}: {exc}"},
                 )
 
         # Add CORS headers to EVERY response
