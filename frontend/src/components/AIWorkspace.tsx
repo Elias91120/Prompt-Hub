@@ -21,6 +21,7 @@ interface Props {
   hasPlan: boolean
   onProjectUpdated: (project: Project) => void
   onOpenPlan: () => void
+  minimal?: boolean
 }
 
 type Tab = 'chat' | 'prompt'
@@ -38,6 +39,7 @@ export default function AIWorkspace({
   hasPlan,
   onProjectUpdated,
   onOpenPlan,
+  minimal = false,
 }: Props) {
   const { t } = useTranslation('editor')
   const [tab, setTab] = useState<Tab>(hasPlan ? 'chat' : 'chat')
@@ -80,49 +82,70 @@ export default function AIWorkspace({
   }
 
   return (
-    <section className="surface-card overflow-hidden">
+    <section className={minimal ? "" : "surface-card overflow-hidden"}>
       {/* ── Header ── */}
-      <div className="border-b border-[var(--color-border)] px-6 py-5">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-3">
-            <span className="kpi-icon">
-              <Sparkles className="h-4 w-4" />
-            </span>
-            <div>
-              <h2 className="text-base font-semibold tracking-tight text-[var(--color-text-primary)]">
-                {t('workspace.title')}
-              </h2>
-              <p className="mt-0.5 text-xs text-[var(--color-text-tertiary)]">
-                {hasPlan ? t('workspace.subtitleWithPlan') : t('workspace.subtitleNoPlan')}
-              </p>
+      {!minimal && (
+        <div className="border-b border-[var(--color-border)] px-6 py-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-center gap-3">
+              <span className="kpi-icon">
+                <Sparkles className="h-4 w-4" />
+              </span>
+              <div>
+                <h2 className="text-base font-semibold tracking-tight text-[var(--color-text-primary)]">
+                  {t('workspace.title')}
+                </h2>
+                <p className="mt-0.5 text-xs text-[var(--color-text-tertiary)]">
+                  {hasPlan ? t('workspace.subtitleWithPlan') : t('workspace.subtitleNoPlan')}
+                </p>
+              </div>
             </div>
+            {hasPlan && (
+              <button onClick={onOpenPlan} className="btn-secondary self-start sm:self-auto">
+                {t('workspace.viewPlan')}
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
           </div>
-          {hasPlan && (
-            <button onClick={onOpenPlan} className="btn-secondary self-start sm:self-auto">
-              {t('workspace.viewPlan')}
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          )}
-        </div>
 
-        {/* Tabs */}
-        <div className="mt-4 inline-flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1">
-          <TabButton
-            active={tab === 'chat'}
-            onClick={() => setTab('chat')}
-            icon={<MessageSquare className="h-3.5 w-3.5" />}
-            label={t('workspace.tabs.chat')}
-          />
-          <TabButton
-            active={tab === 'prompt'}
-            onClick={() => setTab('prompt')}
-            icon={<Wand2 className="h-3.5 w-3.5" />}
-            label={t('workspace.tabs.prompt')}
-          />
+          {/* Tabs */}
+          <div className="mt-4 inline-flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1">
+            <TabButton
+              active={tab === 'chat'}
+              onClick={() => setTab('chat')}
+              icon={<MessageSquare className="h-3.5 w-3.5" />}
+              label={t('workspace.tabs.chat')}
+            />
+            <TabButton
+              active={tab === 'prompt'}
+              onClick={() => setTab('prompt')}
+              icon={<Wand2 className="h-3.5 w-3.5" />}
+              label={t('workspace.tabs.prompt')}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Body ── */}
+      {minimal && (
+        <div className="px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-surface-raised)]">
+           <div className="inline-flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1">
+            <TabButton
+              active={tab === 'chat'}
+              onClick={() => setTab('chat')}
+              icon={<MessageSquare className="h-3.5 w-3.5" />}
+              label={t('workspace.tabs.chat')}
+            />
+            <TabButton
+              active={tab === 'prompt'}
+              onClick={() => setTab('prompt')}
+              icon={<Wand2 className="h-3.5 w-3.5" />}
+              label={t('workspace.tabs.prompt')}
+            />
+          </div>
+        </div>
+      )}
+      
       {tab === 'chat' ? (
         <ChatTab
           projectId={projectId}

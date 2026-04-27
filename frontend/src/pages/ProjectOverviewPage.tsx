@@ -285,6 +285,7 @@ export default function ProjectOverviewPage({
                   hasPlan={hasPlan}
                   onProjectUpdated={setProject}
                   onOpenPlan={() => onOpenPlan(project)}
+                  minimal={true}
                 />
               </div>
             </div>
