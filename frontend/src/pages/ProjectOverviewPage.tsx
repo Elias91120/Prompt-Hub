@@ -1,63 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Sparkles } from 'lucide-react'
-import type { Project, ProjectRecap, StepStatus } from '../types'
+import { ArrowRight, Sparkles, Settings2, Code2, Target, Zap, Activity } from 'lucide-react'
+import type { Project, ProjectRecap } from '../types'
 import { getProject, getProjectRecap } from '../api'
 import AppShell from '../components/layout/AppShell'
 import AIWorkspace from '../components/AIWorkspace'
 import { ErrorBanner, Skeleton } from '../components/ui'
-
 import ProjectSettingsModal from '../components/ProjectSettingsModal'
 
 interface Props {
   projectId: string
-  /** Initial project data (may be slightly stale). Page refetches in background.
-   *  When omitted (e.g. arrival via deep link), the page fetches first and shows
-   *  a skeleton until the response is in. */
   initialProject?: Project
   onBack: () => void
   onOpenPlan: (project: Project) => void
 }
 
-/* ------------------------------------------------------------------ */
-/* Helpers — all pure, derived strictly from the project data         */
-/* ------------------------------------------------------------------ */
-
-function formatDate(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
-function formatRelative(iso: string): string {
-  const then = new Date(iso).getTime()
-  if (Number.isNaN(then)) return ''
-  const diff = Date.now() - then
-  const min = Math.round(diff / 60000)
-  if (min < 1) return 'just now'
-  if (min < 60) return `${min}m ago`
-  const hr = Math.round(min / 60)
-  if (hr < 24) return `${hr}h ago`
-  const day = Math.round(hr / 24)
-  if (day < 30) return `${day}d ago`
-  return formatDate(iso)
-}
-
-interface Stats {
-  phaseCount: number
-  topSteps: number
-  subSteps: number
-  completed: number
-  inProgress: number
-  notStarted: number
-  pct: number
-}
-
-function computeStats(project: Project): Stats {
+function computeStats(project: Project) {
   const phaseCount = project.phases.length
   let topSteps = 0
   let subSteps = 0
@@ -80,26 +38,8 @@ function computeStats(project: Project): Stats {
   }
   const total = topSteps + subSteps
   const pct = total === 0 ? 0 : Math.round((completed / total) * 100)
-  return { phaseCount, topSteps, subSteps, completed, inProgress, notStarted, pct }
+  return { phaseCount, topSteps, subSteps, completed, inProgress, notStarted, pct, total }
 }
-
-const STATUS_DOT: Record<StepStatus, string> = {
-  not_started: 'bg-neutral-600',
-  in_progress: 'bg-[var(--color-accent)]',
-  completed: 'bg-emerald-500',
-  replanned: 'bg-amber-500',
-}
-
-const STATUS_LABEL: Record<StepStatus, string> = {
-  not_started: 'Todo',
-  in_progress: 'In progress',
-  completed: 'Done',
-  replanned: 'Replanned',
-}
-
-/* ------------------------------------------------------------------ */
-/* Component                                                           */
-/* ------------------------------------------------------------------ */
 
 export default function ProjectOverviewPage({
   projectId,
@@ -110,12 +50,12 @@ export default function ProjectOverviewPage({
   const { t } = useTranslation('common')
   const [project, setProject] = useState<Project | null>(initialProject ?? null)
   const [loadError, setLoadError] = useState<unknown>(null)
-  const [recap, setRecap] = useState<ProjectRecap | null>(null)
-  const [recapLoading, setRecapLoading] = useState(false)
-  const [recapError, setRecapError] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  // Refresh project data in the background so stats are accurate.
+  // AI Recap State
+  const [recap, setRecap] = useState<ProjectRecap | null>(null)
+  const [recapLoading, setRecapLoading] = useState(false)
+
   useEffect(() => {
     let active = true
     getProject(projectId)
@@ -128,26 +68,19 @@ export default function ProjectOverviewPage({
       .catch((err) => {
         if (active && !initialProject) setLoadError(err)
       })
-    return () => {
-      active = false
-    }
+    return () => { active = false }
   }, [projectId, initialProject])
 
   const stats = useMemo(() => (project ? computeStats(project) : null), [project])
   const hasPlan = stats ? stats.phaseCount > 0 : false
-  const workspaceRef = useRef<HTMLDivElement>(null)
 
-  function scrollToWorkspace() {
-    workspaceRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  async function handleGenerateRecap() {
+  async function handleLoadRecap() {
     setRecapLoading(true)
-    setRecapError(null)
     try {
-      setRecap(await getProjectRecap(projectId))
+      const res = await getProjectRecap(projectId)
+      setRecap(res)
     } catch (e) {
-      setRecapError(String(e))
+      console.error(e)
     } finally {
       setRecapLoading(false)
     }
@@ -156,28 +89,16 @@ export default function ProjectOverviewPage({
   if (!project || !stats) {
     return (
       <AppShell onBack={onBack} backLabel="Mes projets">
-        <div className="mx-auto w-full max-w-5xl px-6 py-8">
+        <div className="mx-auto w-full max-w-6xl px-6 py-12">
           {loadError ? (
-            <ErrorBanner
-              error={loadError}
-              title="Impossible de charger le projet"
-              onRetry={() => {
-                setLoadError(null)
-                getProject(projectId)
-                  .then(setProject)
-                  .catch((e) => setLoadError(e))
-              }}
-            />
+            <ErrorBanner error={loadError} title="Impossible de charger le projet" onRetry={() => window.location.reload()} />
           ) : (
-            <div className="space-y-4">
-              <Skeleton className="h-32 w-full" />
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Skeleton className="h-20" />
-                <Skeleton className="h-20" />
-                <Skeleton className="h-20" />
-                <Skeleton className="h-20" />
+            <div className="space-y-8">
+              <Skeleton className="h-32 w-full rounded-3xl" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <Skeleton className="h-96 w-full rounded-3xl" />
+                <Skeleton className="h-96 w-full rounded-3xl lg:col-span-2" />
               </div>
-              <Skeleton className="h-48 w-full" />
             </div>
           )}
         </div>
@@ -189,407 +110,197 @@ export default function ProjectOverviewPage({
     <AppShell
       onBack={onBack}
       backLabel={t('breadcrumbs.projects')}
-      breadcrumbs={[
-        { label: t('breadcrumbs.projects'), to: '/' },
-        { label: project.name },
-      ]}
-      leftSlot={
-        <div className="flex items-center gap-3">
-          <span className="kpi-icon h-7 w-7">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
-          </span>
-          <div className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-[var(--color-text-primary)]">
-              {project.name}
-            </span>
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
-              Project overview
-            </span>
-          </div>
-        </div>
-      }
-      rightSlot={
-        hasPlan ? (
-          <button
-            onClick={() => onOpenPlan(project)}
-            className="btn-primary"
-            aria-label="Ouvrir la vue plan"
-          >
-            Ouvrir le plan
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </button>
-        ) : (
-          <button onClick={scrollToWorkspace} className="btn-primary">
-            Générer le plan
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </button>
-        )
-      }
+      breadcrumbs={[{ label: t('breadcrumbs.projects'), to: '/' }, { label: project.name }]}
     >
-      <div className="mx-auto w-full max-w-5xl px-6 py-8">
-        {/* ── Hero card: identity ── */}
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6">
-          <div className="flex items-start justify-between gap-6">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
-                {project.name}
-              </h1>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                {project.objective || (
-                  <em className="text-[var(--color-text-tertiary)]">No objective set.</em>
-                )}
-              </p>
+      <div className="mx-auto w-full max-w-6xl px-6 py-8 sm:py-12">
+        {/* HEADER SECTION */}
+        <header className="mb-10 flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/10 px-3 py-1 mb-4">
+              <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-accent)]">
+                Vue d'ensemble
+              </span>
             </div>
-            <div className="shrink-0 text-right">
-              <div className="text-xs font-medium text-[var(--color-text-tertiary)]">
-                Created {formatDate(project.created_at)}
-              </div>
-              <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">
-                Updated {formatRelative(project.updated_at)}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Stats row ── */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Phases" value={stats.phaseCount} />
-            <Stat label="Top steps" value={stats.topSteps} />
-            <Stat label="Sub-steps" value={stats.subSteps} />
-            <Stat label="Progress" value={`${stats.pct}%`} accent />
-          </div>
-
-          {/* Progress bar */}
-          {hasPlan && (
-            <div className="mt-4">
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-hover)]">
-                <div
-                  className="h-full rounded-full bg-[var(--color-accent)] transition-all"
-                  style={{ width: `${stats.pct}%` }}
-                />
-              </div>
-              <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-[var(--color-text-tertiary)]">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  {stats.completed} done
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
-                  {stats.inProgress} in progress
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-neutral-600" />
-                  {stats.notStarted} todo
-                </span>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* ── Atelier IA — Chat + Quick prompt (always available) ── */}
-        <div ref={workspaceRef} id="workspace" className="mt-6 scroll-mt-24">
-          <AIWorkspace
-            projectId={projectId}
-            project={project}
-            hasPlan={hasPlan}
-            onProjectUpdated={(p) => setProject(p)}
-            onOpenPlan={() => onOpenPlan(project)}
-          />
-        </div>
-
-        {/* ── AI recap ── */}
-        <section className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
-                AI recap
-              </h2>
-              <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">
-                Factual summary based on plan + step statuses · advisory · never modifies anything
-              </p>
-            </div>
-            <button
-              onClick={handleGenerateRecap}
-              disabled={recapLoading || !hasPlan}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-[11px] font-semibold text-black shadow-sm transition-all hover:bg-[var(--color-accent-hover)] disabled:opacity-50"
-            >
-              {recapLoading ? 'Generating…' : recap ? 'Re-generate' : 'Generate recap'}
-            </button>
-          </div>
-
-          {!hasPlan && (
-            <p className="mt-4 rounded-xl border border-dashed border-[var(--color-border)] px-4 py-6 text-center text-xs text-[var(--color-text-tertiary)]">
-              No plan yet — open the plan view to generate one first.
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
+              {project.name}
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--color-text-secondary)] sm:text-base">
+              {project.objective || <em className="opacity-50">Aucun objectif défini.</em>}
             </p>
-          )}
-          {recapError && (
-            <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-xs text-red-400">
-              {recapError}
-            </div>
-          )}
-          {recap && (
-            <div className="mt-4 space-y-4">
-              <div className="rounded-xl border border-[var(--color-accent)]/20 bg-[var(--color-surface)] p-4">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-accent)]">
-                  Where we are · {recap.momentum}
+          </div>
+
+          <div className="shrink-0">
+            {hasPlan ? (
+              <button
+                onClick={() => onOpenPlan(project)}
+                className="group relative inline-flex items-center gap-3 rounded-2xl bg-[var(--color-accent)] px-6 py-3.5 text-sm font-bold text-black shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all hover:scale-105 hover:bg-[var(--color-accent-hover)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
+              >
+                Ouvrir le Plan Visuel
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  document.getElementById('workspace')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="group inline-flex items-center gap-2 rounded-2xl bg-[var(--color-surface-raised)] border border-[var(--color-border)] px-6 py-3.5 text-sm font-bold text-[var(--color-text-primary)] transition-all hover:border-[var(--color-accent)]/50 hover:bg-[var(--color-surface-hover)]"
+              >
+                Générer un Plan
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            )}
+          </div>
+        </header>
+
+        {/* MAIN GRID */}
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+          
+          {/* LEFT SIDEBAR: Context & Stats */}
+          <div className="flex flex-col gap-6 lg:col-span-4">
+            {/* Progress Card */}
+            {hasPlan && (
+              <div className="glass-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
+                    <Activity className="h-4 w-4" /> Progression
+                  </h3>
+                  <span className="text-2xl font-bold text-[var(--color-text-primary)]">{stats.pct}%</span>
                 </div>
-                <p className="mt-1 text-sm leading-relaxed text-[var(--color-text-primary)]">
-                  {recap.where_we_are}
-                </p>
+                
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-hover)]">
+                  <div
+                    className="h-full rounded-full bg-[var(--color-accent)] transition-all duration-1000 ease-out"
+                    style={{ width: `${stats.pct}%` }}
+                  />
+                </div>
+                
+                <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">
+                  <div className="rounded-lg bg-emerald-500/10 py-2 text-emerald-400">
+                    <span className="block text-lg font-bold">{stats.completed}</span> Fait
+                  </div>
+                  <div className="rounded-lg bg-[var(--color-accent)]/10 py-2 text-[var(--color-accent)]">
+                    <span className="block text-lg font-bold">{stats.inProgress}</span> En cours
+                  </div>
+                  <div className="rounded-lg bg-[var(--color-surface-hover)] py-2 text-[var(--color-text-tertiary)]">
+                    <span className="block text-lg font-bold">{stats.notStarted}</span> À faire
+                  </div>
+                </div>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <RecapList
-                  title="What was done"
-                  tone="emerald"
-                  items={recap.what_was_done}
-                  empty="Nothing completed yet."
-                />
-                <RecapList
-                  title="What remains"
-                  tone="sky"
-                  items={recap.what_remains}
-                  empty="Nothing left — plan is complete."
+            )}
+
+            {/* Settings & Context Card */}
+            <div className="glass-card relative overflow-hidden p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2">
+                  <Settings2 className="h-4 w-4" /> Paramètres & Contexte
+                </h3>
+                <button
+                  onClick={() => setSettingsOpen(true)}
+                  className="rounded-full bg-[var(--color-surface-hover)] p-2 text-[var(--color-text-tertiary)] transition-colors hover:bg-[var(--color-accent)]/20 hover:text-[var(--color-accent)]"
+                  title="Modifier les paramètres"
+                >
+                  <Settings2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                    <Code2 className="h-3 w-3" /> Stack
+                  </div>
+                  <div className="text-sm text-[var(--color-text-secondary)]">
+                    {project.stack || <em className="opacity-50">Non spécifiée</em>}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                    <Target className="h-3 w-3" /> Contraintes
+                  </div>
+                  <div className="text-sm text-[var(--color-text-secondary)]">
+                    {project.constraints || <em className="opacity-50">Aucune contrainte</em>}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                    <Zap className="h-3 w-3" /> Règles & Palette
+                  </div>
+                  <div className="text-sm leading-relaxed text-[var(--color-text-secondary)] line-clamp-4">
+                    {project.decisions_log || <em className="opacity-50">Aucune règle définie</em>}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Recap Minified */}
+            {hasPlan && (
+              <div className="glass-card p-6">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] flex items-center gap-2 mb-4">
+                  <Activity className="h-4 w-4" /> Rapport IA
+                </h3>
+                {!recap ? (
+                  <button
+                    onClick={handleLoadRecap}
+                    disabled={recapLoading}
+                    className="w-full rounded-xl border border-dashed border-[var(--color-border)] py-4 text-xs font-medium text-[var(--color-text-tertiary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+                  >
+                    {recapLoading ? 'Analyse en cours...' : 'Générer un résumé du projet'}
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
+                      <strong className="text-[var(--color-accent)] block mb-1">Status actuel :</strong>
+                      {recap.where_we_are}
+                    </p>
+                    <button
+                      onClick={handleLoadRecap}
+                      className="text-[10px] uppercase font-bold text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                    >
+                      Actualiser
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN: AI Workspace (Chat) */}
+          <div className="lg:col-span-8">
+            <div className="glass-card flex min-h-[600px] flex-col overflow-hidden" id="workspace" style={{ padding: 0 }}>
+              <div className="flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-accent)]/20">
+                  <Sparkles className="h-4 w-4 text-[var(--color-accent)]" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-[var(--color-text-primary)]">Atelier IA</h2>
+                  <p className="text-[11px] text-[var(--color-text-tertiary)]">Discutez avec l'IA pour générer ou modifier le plan.</p>
+                </div>
+              </div>
+              <div className="flex-1 bg-[var(--color-surface)] relative">
+                <AIWorkspace
+                  projectId={projectId}
+                  project={project}
+                  hasPlan={hasPlan}
+                  onProjectUpdated={setProject}
+                  onOpenPlan={() => onOpenPlan(project)}
                 />
               </div>
             </div>
-          )}
-        </section>
-
-        {/* ── Project facts ── */}
-        <section className="mt-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
-                Project Settings & Facts
-              </h2>
-              <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">
-                Règles du projet, palette de couleurs, stack technique et contraintes globales.
-              </p>
-            </div>
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)] shadow-sm transition-all hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
-            >
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M13.5 2.5a2.121 2.121 0 0 1 0 3L6 13l-4 1 1-4 7.5-7.5a2.121 2.121 0 0 1 3 0z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Modifier les paramètres
-            </button>
           </div>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <FactCard title="Constraints" content={project.constraints} />
-            <FactCard title="Stack" content={project.stack} />
-            <FactCard
-              title="Règles / Palette / Décisions techniques"
-              content={project.decisions_log}
-              className="lg:col-span-2"
-            />
-          </div>
-        </section>
-
-        {/* ── Phase / step breakdown ── */}
-        {hasPlan && (
-          <section className="mt-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6">
-            <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
-              Plan breakdown
-            </h2>
-            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">
-              Read-only outline of every phase and step.
-            </p>
-            <div className="mt-4 space-y-5">
-              {[...project.phases]
-                .sort((a, b) => a.order - b.order)
-                .map((ph) => {
-                  const topSteps = ph.steps
-                    .filter((s) => s.parent_step_id === null)
-                    .sort((a, b) => a.order - b.order)
-                  return (
-                    <div key={ph.id}>
-                      <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-1.5">
-                        <h3 className="text-[13px] font-semibold text-[var(--color-text-primary)]">
-                          Phase {ph.order + 1} · {ph.name}
-                        </h3>
-                        <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                          {topSteps.length} step{topSteps.length === 1 ? '' : 's'}
-                        </span>
-                      </div>
-                      <ul className="mt-2 space-y-1">
-                        {topSteps.map((s) => (
-                          <li key={s.id} className="rounded-lg px-2 py-1.5 hover:bg-[var(--color-surface-hover)]">
-                            <div className="flex items-start gap-2">
-                              <span
-                                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[s.status]}`}
-                                title={STATUS_LABEL[s.status]}
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="truncate text-[12px] font-medium text-[var(--color-text-primary)]">
-                                    {s.name}
-                                  </span>
-                                  <span className="rounded bg-[var(--color-surface)] px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                                    {s.step_type}
-                                  </span>
-                                </div>
-                                {s.objective && (
-                                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-[var(--color-text-secondary)]">
-                                    {s.objective}
-                                  </p>
-                                )}
-                                {s.sub_steps.length > 0 && (
-                                  <ul className="mt-1.5 space-y-0.5 border-l border-[var(--color-border)] pl-3">
-                                    {[...s.sub_steps]
-                                      .sort((a, b) => a.order - b.order)
-                                      .map((sub) => (
-                                        <li
-                                          key={sub.id}
-                                          className="flex items-center gap-2 text-[11px] text-[var(--color-text-secondary)]"
-                                        >
-                                          <span
-                                            className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[sub.status]}`}
-                                          />
-                                          <span className="truncate">{sub.name}</span>
-                                        </li>
-                                      ))}
-                                  </ul>
-                                )}
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )
-                })}
-            </div>
-          </section>
-        )}
-
-        <div className="mt-8 flex justify-end">
-          <button
-            onClick={() => onOpenPlan(project)}
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-black shadow-sm transition-all hover:bg-[var(--color-accent-hover)]"
-          >
-            Open plan view
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M6 4L10 8L6 12"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          
         </div>
       </div>
-      
+
       {project && (
         <ProjectSettingsModal
           project={project}
           open={settingsOpen}
           onClose={() => setSettingsOpen(false)}
-          onProjectUpdated={(p) => setProject(p)}
+          onProjectUpdated={setProject}
         />
       )}
     </AppShell>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Sub-components                                                      */
-/* ------------------------------------------------------------------ */
-
-function Stat({
-  label,
-  value,
-  accent,
-}: {
-  label: string
-  value: number | string
-  accent?: boolean
-}) {
-  return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5">
-      <div className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
-        {label}
-      </div>
-      <div
-        className={`mt-0.5 text-xl font-bold tabular-nums ${
-          accent ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-primary)]'
-        }`}
-      >
-        {value}
-      </div>
-    </div>
-  )
-}
-
-function FactCard({
-  title,
-  content,
-  className,
-}: {
-  title: string
-  content: string | null | undefined
-  className?: string
-}) {
-  return (
-    <div
-      className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 ${
-        className ?? ''
-      }`}
-    >
-      <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-        {title}
-      </h3>
-      {content && content.trim() ? (
-        <p className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
-          {content}
-        </p>
-      ) : (
-        <p className="mt-2 text-[12px] italic text-[var(--color-text-tertiary)]">
-          Not specified.
-        </p>
-      )}
-    </div>
-  )
-}
-
-function RecapList({
-  title,
-  items,
-  tone,
-  empty,
-}: {
-  title: string
-  items: string[]
-  tone: 'emerald' | 'sky'
-  empty: string
-}) {
-  const dot = tone === 'emerald' ? 'bg-emerald-500' : 'bg-sky-400'
-  const ring = tone === 'emerald' ? 'border-emerald-500/20' : 'border-sky-500/20'
-  return (
-    <div className={`rounded-xl border ${ring} bg-[var(--color-surface)] p-4`}>
-      <h4 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-        {title}
-      </h4>
-      {items.length === 0 ? (
-        <p className="mt-2 text-[12px] italic text-[var(--color-text-tertiary)]">{empty}</p>
-      ) : (
-        <ul className="mt-2 space-y-1.5">
-          {items.map((it, i) => (
-            <li key={i} className="flex items-start gap-2 text-[12px] leading-snug text-[var(--color-text-secondary)]">
-              <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
-              <span>{it}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
   )
 }
