@@ -11,8 +11,10 @@ Supabase or any other provider).  The connection is configured via the
 from __future__ import annotations
 
 import os
+import logging
 from collections.abc import Generator
 from pathlib import Path
+from urllib.parse import quote_plus
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -20,14 +22,45 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db.base import Base
 
+logger = logging.getLogger(__name__)
+
 # ── Connection string ────────────────────────────────────────────────────
 _DEFAULT_SQLITE = f"sqlite:///{Path(__file__).resolve().parent.parent.parent / 'prompt_hub.db'}"
-_DATABASE_URL = os.environ.get("DATABASE_URL", _DEFAULT_SQLITE)
 
-# Fix Render/Supabase URLs that start with "postgres://" (needed by SQLAlchemy 2.x)
-if _DATABASE_URL.startswith("postgres://"):
-    _DATABASE_URL = _DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+def _build_database_url() -> str:
+    """Build the database URL from env vars.
+
+    Supports two modes:
+    1. ``DATABASE_URL`` — full connection string (easiest)
+    2. Individual vars: ``DB_HOST``, ``DB_PASSWORD``, ``DB_PORT``, ``DB_NAME``
+       (safer for passwords with special characters)
+    """
+    raw = os.environ.get("DATABASE_URL", "").strip()
+
+    # If individual vars are provided, build the URL from parts
+    db_host = os.environ.get("DB_HOST", "")
+    db_password = os.environ.get("DB_PASSWORD", "")
+    if db_host and db_password:
+        db_user = os.environ.get("DB_USER", "postgres")
+        db_port = os.environ.get("DB_PORT", "5432")
+        db_name = os.environ.get("DB_NAME", "postgres")
+        # quote_plus handles special chars in passwords
+        return f"postgresql://{db_user}:{quote_plus(db_password)}@{db_host}:{db_port}/{db_name}"
+
+    if not raw:
+        logger.info("No DATABASE_URL set — using local SQLite.")
+        return _DEFAULT_SQLITE
+
+    # Fix Render/Supabase URLs that start with "postgres://"
+    if raw.startswith("postgres://"):
+        raw = raw.replace("postgres://", "postgresql://", 1)
+
+    logger.info("Using DATABASE_URL (host: %s)", raw.split("@")[-1] if "@" in raw else "hidden")
+    return raw
+
+
+_DATABASE_URL = _build_database_url()
 _engine: Engine | None = None
 _SessionLocal: sessionmaker[Session] | None = None
 
