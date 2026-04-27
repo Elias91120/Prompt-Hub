@@ -450,6 +450,7 @@ async def generate_project_plan(
                         status=sub.status.value,
                         step_type=sub.step_type.value,
                         order=sub.order,
+                        phase_id=phase.id,
                     )
                 )
             phase_db.steps.append(step_db)
