@@ -1,0 +1,69 @@
+{
+  "header": {
+    "back": "Project",
+    "regenerate": "Regenerate",
+    "generating": "Generating…",
+    "next": "Next",
+    "nextTitle": "Jump to the next step to attack"
+  },
+  "panels": {
+    "assistant": "Assistant",
+    "assistantTitle": "Project assistant",
+    "timeline": "Timeline",
+    "timelineTitle": "Project audit log",
+    "skills": "Skills",
+    "skillsTitle": "Reusable conventions injected into every prompt",
+    "insights": "Insights",
+    "insightsTitle": "Advisory analyses — never auto-edits the plan"
+  },
+  "graph": {
+    "hint": "Click a step to inspect · scroll to zoom · drag to pan"
+  },
+  "drawers": {
+    "closeAssistant": "Close assistant",
+    "closeTimeline": "Close timeline",
+    "closeSkills": "Close skills panel",
+    "closeInsights": "Close insights panel",
+    "closeStepDetail": "Close panel"
+  },
+  "chat": {
+    "empty": {
+      "title": "Chat with the assistant",
+      "description": "Describe your project, ask a question about a step, or request changes. The agent can adapt the plan on the fly."
+    },
+    "title": "Project assistant",
+    "focusBadge": "Step focus ×",
+    "focusTitle": "Click to remove focus on this step",
+    "llmUnreachable": "⚠️ The AI service is not responding. Check your connection or try again."
+  },
+  "timeline": {
+    "title": "Timeline",
+    "filteredByStep": "Filtered by step",
+    "loadError": "Unable to load history",
+    "empty": {
+      "title": "No events yet",
+      "description": "The audit log will fill up as soon as you generate a plan, edit a step or chat with the assistant."
+    }
+  },
+  "skills": {
+    "title": "Skills",
+    "newButton": "+ New",
+    "createCta": "+ Create a skill",
+    "empty": {
+      "title": "No skills for this project",
+      "description": "Add reusable conventions, glossary entries, or anti-patterns. These skills will be injected automatically into every prompt."
+    }
+  },
+  "insights": {
+    "title": "Insights",
+    "subtitle": "Advisory · never auto-edits"
+  },
+  "step": {
+    "thisStep": "this step",
+    "discussInChat": "Discuss in chat"
+  },
+  "toasts": {
+    "planGenerated": "Plan generated successfully.",
+    "planGenerationFailed": "Plan generation failed."
+  }
+}

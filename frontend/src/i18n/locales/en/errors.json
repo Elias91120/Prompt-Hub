@@ -1,0 +1,12 @@
+{
+  "network": "Cannot connect. Check your network or that the backend server is running.",
+  "notFound": "The requested resource was not found.",
+  "validation": "Invalid data. Please check your input.",
+  "server": "The server encountered an error. Try again in a moment.",
+  "llmUnreachable": "The AI service is not responding. Check your connection or try again later.",
+  "unknown": "An unexpected error occurred.",
+  "loadProjectFailed": "Unable to load the project.",
+  "loadProjectsFailed": "Unable to load projects.",
+  "loadHistoryFailed": "Unable to load history.",
+  "deleteFailed": "Delete failed."
+}

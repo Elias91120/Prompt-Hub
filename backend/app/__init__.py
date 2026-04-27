@@ -1,0 +1,1 @@
+"""Prompt Hub backend application."""

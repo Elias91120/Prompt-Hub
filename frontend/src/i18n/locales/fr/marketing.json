@@ -1,0 +1,120 @@
+{
+  "features": {
+    "eyebrow": "Fonctionnalités",
+    "title": "Tout pour passer de l'idée au code",
+    "subtitle": "Une boîte à outils complète qui transforme un projet flou en plan d'attaque exécutable, avec des agents IA dédiés à chaque étape.",
+    "items": {
+      "plan": {
+        "title": "Plan structuré en un clic",
+        "description": "Décrivez votre projet, l'agent Plan le découpe en phases et étapes ordonnées, prêtes à exécuter."
+      },
+      "prompts": {
+        "title": "Prompts contextualisés",
+        "description": "Chaque étape génère un prompt complet (objectifs, contraintes, décisions, stack) prêt pour Copilot ou ChatGPT."
+      },
+      "chat": {
+        "title": "Chat conversationnel",
+        "description": "Discutez avec un agent qui comprend le projet entier et adapte le plan en temps réel selon vos retours."
+      },
+      "substeps": {
+        "title": "Sous-étapes à la demande",
+        "description": "Zoomez sur n'importe quelle étape pour la décomposer en sous-tâches actionnables générées par l'IA."
+      },
+      "graph": {
+        "title": "Graphe de dépendances",
+        "description": "Visualisez votre plan comme un graphe interactif : phases, étapes, sous-étapes, statuts et progression."
+      },
+      "analyse": {
+        "title": "Analyse & feedback",
+        "description": "Détecte les incohérences, recommande la prochaine étape, et applique vos retours pour faire évoluer le plan."
+      },
+      "history": {
+        "title": "Historique versionné",
+        "description": "Chaque mutation du plan génère un événement réversible. Annulez une adaptation IA en un clic."
+      },
+      "skills": {
+        "title": "Compétences projet",
+        "description": "Capitalisez vos conventions, glossaires et anti-patterns — automatiquement injectés dans les prompts pertinents."
+      }
+    }
+  },
+  "howItWorks": {
+    "eyebrow": "Comment ça marche",
+    "title": "Quatre étapes, un plan exécutable",
+    "steps": {
+      "describe": {
+        "title": "Décrivez votre idée",
+        "description": "Nom, objectif, stack, contraintes. Quelques lignes suffisent pour amorcer la machine."
+      },
+      "structure": {
+        "title": "L'IA structure le plan",
+        "description": "L'agent Plan génère une arborescence Phases → Étapes ordonnée, cohérente et révisable."
+      },
+      "refine": {
+        "title": "Affinez via le chat",
+        "description": "Discutez avec les agents : ils adaptent le plan, ajoutent des sous-étapes et détectent les risques."
+      },
+      "execute": {
+        "title": "Exécutez les prompts",
+        "description": "Chaque étape produit un prompt contextualisé prêt à coller dans votre IDE pour générer le code."
+      }
+    }
+  },
+  "agentsShowcase": {
+    "eyebrow": "Agents",
+    "title": "Une équipe d'agents IA spécialisés",
+    "subtitle": "Chaque agent a un rôle précis et un périmètre clair. Ensemble ils forment un copilote complet pour piloter votre projet.",
+    "items": {
+      "plan": {
+        "name": "Plan",
+        "role": "Planner",
+        "description": "Découpe le projet en phases puis en étapes ordonnées, en respectant stack, contraintes et décisions."
+      },
+      "substeps": {
+        "name": "Substeps",
+        "role": "Generator",
+        "description": "Décompose une étape en sous-étapes actionnables quand le grain devient trop gros."
+      },
+      "chat": {
+        "name": "Chat",
+        "role": "Router",
+        "description": "Comprend l'intention de l'utilisateur, route vers le bon outil et adapte le plan en temps réel."
+      },
+      "prompt": {
+        "name": "Prompt",
+        "role": "Generator",
+        "description": "Construit pour chaque étape un prompt riche : contexte, dépendances, compétences, stack."
+      },
+      "analyse": {
+        "name": "Analyse",
+        "role": "Analyser",
+        "description": "Audit du plan : détecte gaps, doublons, dépendances manquantes, scope dérive et risques."
+      },
+      "feedback": {
+        "name": "Feedback",
+        "role": "Analyser",
+        "description": "Lit votre retour libre, en extrait les actions, marque l'étape comme faite et propose une révision."
+      },
+      "recap": {
+        "name": "Recap",
+        "role": "Summariser",
+        "description": "Synthèse périodique : où vous en êtes, ce qui est fait, ce qui reste, et le momentum du projet."
+      }
+    }
+  },
+  "cta": {
+    "title": "Prêt à structurer votre prochain projet ?",
+    "subtitle": "Lancez Prompt Hub et obtenez un plan d'exécution complet en quelques minutes — pas en quelques jours.",
+    "primary": "Démarrer un projet",
+    "secondary": "Découvrir les fonctionnalités"
+  },
+  "footer": {
+    "tagline": "Planification de projets assistée par IA",
+    "links": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "agents": "Agents",
+      "projects": "Projets"
+    }
+  }
+}

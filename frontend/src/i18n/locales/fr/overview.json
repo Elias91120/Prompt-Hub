@@ -1,0 +1,31 @@
+{
+  "header": {
+    "objectivePlaceholder": "Décrivez l'objectif principal du projet…",
+    "openPlan": "Ouvrir le plan",
+    "generatePlan": "Générer le plan"
+  },
+  "workspace": {
+    "title": "Atelier IA",
+    "subtitle": "Discutez avec l'agent ou décrivez votre projet pour générer le plan."
+  },
+  "stats": {
+    "phases_one": "{{count}} phase",
+    "phases_other": "{{count}} phases",
+    "steps_one": "{{count}} étape",
+    "steps_other": "{{count}} étapes",
+    "completed": "{{done}}/{{total}} faites",
+    "progress": "Progression"
+  },
+  "noPlan": {
+    "title": "Aucun plan pour ce projet",
+    "description": "La génération du plan se fait depuis la <strong>vue du projet</strong>, dans la section <em>Atelier IA</em>. Vous pourrez y discuter avec l'agent ou décrire votre projet en une fois.",
+    "cta": "Vue du projet"
+  },
+  "regenerate": {
+    "title": "Régénérer le plan ?",
+    "description": "Cette action remplace le plan existant. Vous pouvez fournir des instructions pour orienter la nouvelle génération.",
+    "instructionsPlaceholder": "Instructions optionnelles (ex : « concentre-toi sur le backend »)",
+    "confirm": "Régénérer",
+    "cancel": "Annuler"
+  }
+}

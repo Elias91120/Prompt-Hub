@@ -1,0 +1,69 @@
+{
+  "header": {
+    "back": "Projet",
+    "regenerate": "Régénérer",
+    "generating": "Génération…",
+    "next": "Suivant",
+    "nextTitle": "Aller à la prochaine étape à attaquer"
+  },
+  "panels": {
+    "assistant": "Assistant",
+    "assistantTitle": "Assistant du projet",
+    "timeline": "Timeline",
+    "timelineTitle": "Journal d'audit du projet",
+    "skills": "Skills",
+    "skillsTitle": "Conventions réutilisables injectées dans chaque prompt",
+    "insights": "Insights",
+    "insightsTitle": "Analyses consultatives — ne modifient jamais le plan automatiquement"
+  },
+  "graph": {
+    "hint": "Cliquez sur une étape pour l'inspecter · molette pour zoomer · glissez pour déplacer"
+  },
+  "drawers": {
+    "closeAssistant": "Fermer l'assistant",
+    "closeTimeline": "Fermer le journal",
+    "closeSkills": "Fermer le panneau Skills",
+    "closeInsights": "Fermer le panneau Insights",
+    "closeStepDetail": "Fermer le panneau"
+  },
+  "chat": {
+    "empty": {
+      "title": "Discutez avec l'assistant",
+      "description": "Décrivez votre projet, posez une question sur une étape ou demandez des modifications. L'agent peut adapter le plan à la volée."
+    },
+    "title": "Assistant du projet",
+    "focusBadge": "Focus étape ×",
+    "focusTitle": "Cliquez pour retirer le focus sur ce step",
+    "llmUnreachable": "⚠️ Le service IA ne répond pas. Vérifiez votre connexion ou réessayez."
+  },
+  "timeline": {
+    "title": "Timeline",
+    "filteredByStep": "Filtré par étape",
+    "loadError": "Impossible de charger l'historique",
+    "empty": {
+      "title": "Aucun événement pour l'instant",
+      "description": "Le journal d'audit se remplira dès que vous générerez un plan, modifierez une étape ou discuterez avec l'assistant."
+    }
+  },
+  "skills": {
+    "title": "Skills",
+    "newButton": "+ Nouveau",
+    "createCta": "+ Créer un skill",
+    "empty": {
+      "title": "Aucun skill pour ce projet",
+      "description": "Ajoutez des conventions réutilisables, des entrées de glossaire ou des anti-patterns. Ces skills seront injectés automatiquement dans chaque prompt."
+    }
+  },
+  "insights": {
+    "title": "Insights",
+    "subtitle": "Consultatif · ne modifie jamais"
+  },
+  "step": {
+    "thisStep": "cette étape",
+    "discussInChat": "En discuter avec l'assistant"
+  },
+  "toasts": {
+    "planGenerated": "Plan généré avec succès.",
+    "planGenerationFailed": "Échec de la génération du plan."
+  }
+}

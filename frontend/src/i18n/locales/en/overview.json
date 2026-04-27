@@ -1,0 +1,31 @@
+{
+  "header": {
+    "objectivePlaceholder": "Describe the main objective of the project…",
+    "openPlan": "Open plan",
+    "generatePlan": "Generate plan"
+  },
+  "workspace": {
+    "title": "AI workshop",
+    "subtitle": "Chat with the agent or describe your project to generate the plan."
+  },
+  "stats": {
+    "phases_one": "{{count}} phase",
+    "phases_other": "{{count}} phases",
+    "steps_one": "{{count}} step",
+    "steps_other": "{{count}} steps",
+    "completed": "{{done}}/{{total}} done",
+    "progress": "Progress"
+  },
+  "noPlan": {
+    "title": "No plan for this project",
+    "description": "Plan generation happens from the <strong>project overview</strong>, in the <em>AI workshop</em> section. You can chat with the agent there or describe your project all at once.",
+    "cta": "Project overview"
+  },
+  "regenerate": {
+    "title": "Regenerate the plan?",
+    "description": "This action replaces the existing plan. You can provide instructions to steer the new generation.",
+    "instructionsPlaceholder": "Optional instructions (e.g. \"focus on the backend\")",
+    "confirm": "Regenerate",
+    "cancel": "Cancel"
+  }
+}

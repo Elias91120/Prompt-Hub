@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "eyebrow": "AI workshop · multi-agent",
+    "title1": "Turn an idea into a",
+    "titleHighlight": "ready-to-code",
+    "title2": "execution plan.",
+    "subtitle": "Prompt Hub structures your project into phases and steps, generates contextual prompts for every task, and orchestrates a team of specialized AI agents to help you ship.",
+    "ctaPrimary": "Create a project",
+    "ctaSecondary": "View my projects",
+    "badges": {
+      "local": "Mistral AI",
+      "vllm": "Cloud-ready",
+      "agents": "7+ specialized agents",
+      "oss": "Open source"
+    }
+  },
+  "projects": {
+    "sectionTitle": "Your projects",
+    "sectionSubtitle": "Pick up where you left off or start a new plan.",
+    "empty": {
+      "title": "No projects yet",
+      "description": "Create your first project and let AI agents structure your attack plan in seconds.",
+      "cta": "Create my first project"
+    },
+    "card": {
+      "noObjective": "Objective not set",
+      "phasesCount_one": "{{count}} phase",
+      "phasesCount_other": "{{count}} phases",
+      "stepsCount_one": "{{count}} step",
+      "stepsCount_other": "{{count}} steps",
+      "deleteConfirm": "Delete project \"{{name}}\"?",
+      "deleteWarning": "This action is irreversible. All phases, steps and associated history will be permanently deleted."
+    }
+  }
+}

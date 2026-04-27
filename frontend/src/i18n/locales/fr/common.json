@@ -1,0 +1,40 @@
+{
+  "appName": "Prompt Hub",
+  "tagline": "Atelier IA pour structurer vos projets",
+  "madeBy": "par Webgen",
+  "language": "Langue",
+  "languages": {
+    "fr": "Français",
+    "en": "English"
+  },
+  "actions": {
+    "back": "Retour",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "create": "Créer",
+    "close": "Fermer",
+    "edit": "Modifier",
+    "retry": "Réessayer",
+    "dismiss": "Ignorer",
+    "open": "Ouvrir",
+    "loading": "Chargement…",
+    "generating": "Génération…",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "skipToContent": "Aller au contenu principal",
+    "home": "Accueil",
+    "newProject": "Nouveau projet"
+  },
+  "breadcrumbs": {
+    "projects": "Projets",
+    "plan": "Plan",
+    "overview": "Vue du projet"
+  },
+  "loading": {
+    "default": "Chargement…",
+    "page": "Chargement de la page…",
+    "project": "Chargement du projet…"
+  }
+}

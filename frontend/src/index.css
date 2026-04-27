@@ -1,0 +1,637 @@
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@theme {
+  --color-surface: #070808;
+  --color-surface-raised: #101212;
+  --color-surface-hover: #181b1b;
+  --color-surface-active: #0d1f12;
+  --color-border: #1f2222;
+  --color-border-strong: #2e3232;
+  --color-border-accent: #3ecf8e35;
+  --color-text-primary: #ededed;
+  --color-text-secondary: #a1a4a4;
+  --color-text-tertiary: #5c6262;
+  --color-accent: #3ecf8e;
+  --color-accent-hover: #2bb573;
+  --color-accent-subtle: #0d2818;
+  --color-accent-glow: #3ecf8e22;
+  --color-accent-50: #ecfdf5;
+  --color-accent-100: #d1fae5;
+  --color-accent-200: #a7f3d0;
+  --color-accent-300: #6ee7b7;
+  --color-accent-400: #4ade80;
+  --color-accent-500: #3ecf8e;
+  --color-accent-600: #2bb573;
+  --color-accent-700: #15803d;
+  --color-accent-800: #166534;
+  --color-accent-900: #064e3b;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px -4px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 4px 24px -6px rgba(62, 207, 142, 0.18), 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 1px rgba(62, 207, 142, 0.25), 0 8px 32px -8px rgba(62, 207, 142, 0.35);
+  --shadow-glow-sm: 0 0 0 1px rgba(62, 207, 142, 0.25), 0 4px 16px -4px rgba(62, 207, 142, 0.25);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html {
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  background-image:
+    radial-gradient(1200px 600px at 50% -10%, rgba(62, 207, 142, 0.06), transparent 60%),
+    radial-gradient(800px 400px at 90% 110%, rgba(62, 207, 142, 0.04), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Selection */
+::selection {
+  background-color: #3ecf8e30;
+  color: #dcfce7;
+}
+
+/* ============================================================ */
+/*  React Flow theme overrides (Notion-premium dark + green)    */
+/* ============================================================ */
+
+.react-flow {
+  background: var(--color-surface);
+}
+
+.react-flow__node {
+  font-family: inherit;
+  border: none;
+  background: transparent;
+  padding: 0;
+  transition: transform 0.15s ease;
+}
+.react-flow__node:hover:not(.react-flow__node-phase) {
+  transform: translateY(-2px);
+}
+
+.react-flow__node.selected {
+  outline: none;
+  box-shadow: none;
+}
+
+.react-flow__handle {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.react-flow__node:hover .react-flow__handle {
+  opacity: 0.6;
+}
+
+/* Edge dash-flow animation (in_progress edges) */
+@keyframes plan-edge-dash-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.plan-edge-flow {
+  animation: plan-edge-dash-flow 1.4s linear infinite;
+}
+
+/* Pulse on in-progress status dots */
+@keyframes plan-step-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--color-accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+.step-dot-pulse {
+  animation: plan-step-dot-pulse 1.6s ease-in-out infinite;
+}
+
+/* Node enter animation (used when sub-steps are generated) */
+@keyframes plan-node-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.plan-substep-node,
+.plan-step-node {
+  animation: plan-node-enter 0.3s ease-out both;
+}
+
+/* Flash animation: highlights step cards just edited by an `adapt_plan`
+ * action so the user sees what changed. The PlanGraph clears the
+ * `flashing` flag after 3 s. */
+@keyframes plan-step-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.0), 0 0 0 0 rgba(245, 158, 11, 0.0);
+    background-color: rgba(245, 158, 11, 0.18);
+  }
+  35% {
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.45),
+      0 0 24px 6px rgba(245, 158, 11, 0.35);
+    background-color: rgba(245, 158, 11, 0.16);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    background-color: transparent;
+  }
+}
+.plan-step-flash {
+  animation: plan-step-flash 3s ease-out 1;
+}
+
+/* Controls + MiniMap dark theme */
+.plan-graph-controls.react-flow__controls {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.6);
+}
+.plan-graph-controls .react-flow__controls-button {
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  fill: currentColor;
+  width: 28px;
+  height: 28px;
+}
+.plan-graph-controls .react-flow__controls-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.plan-graph-minimap.react-flow__minimap {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+/* ============================================================ */
+/*  Design-system primitives (landing + dashboard)              */
+/* ============================================================ */
+
+@layer components {
+  /* ── Surfaces ── */
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.01)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-card);
+  }
+  .glass-card-hover {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.01)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-card);
+    transition: all 0.25s ease;
+  }
+  .glass-card-hover:hover {
+    border-color: var(--color-border-accent);
+    background: linear-gradient(
+      135deg,
+      rgba(62, 207, 142, 0.04),
+      rgba(255, 255, 255, 0.015)
+    );
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+  .surface-card {
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+  }
+  .panel {
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.125rem;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #04140b;
+    background: linear-gradient(135deg, #4ade80, var(--color-accent) 60%, var(--color-accent-hover));
+    box-shadow: var(--shadow-glow-sm);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.125rem;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-border-strong);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--color-border-accent);
+  }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background: transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .btn-ghost:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .icon-btn:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+  }
+
+  /* ── Inputs ── */
+  .input-field,
+  .textarea-field,
+  .select-field {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.625rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .input-field::placeholder,
+  .textarea-field::placeholder {
+    color: var(--color-text-tertiary);
+  }
+  .input-field:focus,
+  .textarea-field:focus,
+  .select-field:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background: rgba(62, 207, 142, 0.04);
+    box-shadow: 0 0 0 3px rgba(62, 207, 142, 0.12);
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    border: 1px solid transparent;
+  }
+  .badge-success {
+    color: #6ee7b7;
+    background: rgba(62, 207, 142, 0.1);
+    border-color: rgba(62, 207, 142, 0.25);
+  }
+  .badge-warning {
+    color: #fcd34d;
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.25);
+  }
+  .badge-danger {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+  }
+  .badge-info {
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.25);
+  }
+  .badge-neutral {
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--color-border);
+  }
+
+  /* ── Chips ── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-border);
+    transition: all 0.15s ease;
+  }
+  .chip-active {
+    color: var(--color-accent);
+    background: rgba(62, 207, 142, 0.1);
+    border-color: rgba(62, 207, 142, 0.3);
+  }
+
+  /* ── Typography helpers ── */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .eyebrow::before {
+    content: '';
+    width: 1.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-accent));
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, #6ee7b7 0%, var(--color-accent) 50%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* ── Metric card ── */
+  .metric-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.01)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.875rem;
+    padding: 1rem 1.125rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .kpi-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+    background: rgba(62, 207, 142, 0.1);
+    color: var(--color-accent);
+    border: 1px solid rgba(62, 207, 142, 0.18);
+  }
+  .kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1;
+  }
+  .kpi-label {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ── Animations ── */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-8px, -16px); }
+}
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out both;
+}
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+.animate-float-delayed {
+  animation: float 10s ease-in-out 3s infinite;
+}
+
+.stagger-children > * {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* ── UX primitives: skeleton shimmer + toast slide-in ── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton-shimmer {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.0) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
+  background-size: 400px 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-toast-in {
+  animation: toast-in 180ms ease-out both;
+}
+
+/* Three-dot "agent is thinking" indicator (used in ChatPanel before
+   the first token of the streamed reply arrives). */
+@keyframes chat-thinking-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+.chat-thinking-dot {
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: currentColor;
+  animation: chat-thinking-bounce 1.1s ease-in-out infinite;
+}
+.chat-thinking-dot-2 { animation-delay: 0.18s; }
+.chat-thinking-dot-3 { animation-delay: 0.36s; }
+
+/* Honour user's reduced-motion preference everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip-link: hidden until focused. Helps keyboard users jump past nav. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  z-index: 2000;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--color-accent);
+  color: #04140b;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+  outline: none;
+}
+
+/* ============================================================ */
+/*  Global keyboard focus ring (a11y / WCAG 2.4.7)              */
+/* ------------------------------------------------------------ */
+/*  Use :focus-visible so mouse clicks don't show the ring,     */
+/*  but Tab navigation always reveals an obvious accent halo.   */
+/* ============================================================ */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* Inputs / textareas already have a border — keep ring tight. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-offset: 0;
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+/* Decorative grid overlay used in hero */
+.bg-grid-fade {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, black, transparent 70%);
+}

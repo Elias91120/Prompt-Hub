@@ -1,0 +1,35 @@
+{
+  "hero": {
+    "eyebrow": "Atelier IA · multi-agents",
+    "title1": "Transformez une idée en",
+    "titleHighlight": "plan d'exécution",
+    "title2": "prêt à coder.",
+    "subtitle": "Prompt Hub structure votre projet en phases et étapes, génère des prompts contextualisés pour chaque tâche, et orchestre une équipe d'agents IA spécialisés pour vous aider à avancer.",
+    "ctaPrimary": "Créer un projet",
+    "ctaSecondary": "Voir mes projets",
+    "badges": {
+      "local": "Mistral AI",
+      "vllm": "Cloud-ready",
+      "agents": "7+ agents spécialisés",
+      "oss": "Open source"
+    }
+  },
+  "projects": {
+    "sectionTitle": "Vos projets",
+    "sectionSubtitle": "Reprenez là où vous vous êtes arrêté ou démarrez un nouveau plan.",
+    "empty": {
+      "title": "Aucun projet pour le moment",
+      "description": "Créez votre premier projet et laissez les agents IA structurer votre plan d'attaque en quelques secondes.",
+      "cta": "Créer mon premier projet"
+    },
+    "card": {
+      "noObjective": "Objectif non défini",
+      "phasesCount_one": "{{count}} phase",
+      "phasesCount_other": "{{count}} phases",
+      "stepsCount_one": "{{count}} étape",
+      "stepsCount_other": "{{count}} étapes",
+      "deleteConfirm": "Supprimer le projet « {{name}} » ?",
+      "deleteWarning": "Cette action est irréversible. Toutes les phases, étapes et historiques associés seront définitivement supprimés."
+    }
+  }
+}

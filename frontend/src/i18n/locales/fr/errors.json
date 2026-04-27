@@ -1,0 +1,12 @@
+{
+  "network": "Connexion impossible. Vérifiez votre réseau ou que le serveur backend est lancé.",
+  "notFound": "La ressource demandée est introuvable.",
+  "validation": "Données invalides. Merci de vérifier votre saisie.",
+  "server": "Le serveur a rencontré une erreur. Réessayez dans un instant.",
+  "llmUnreachable": "Le service IA ne répond pas. Vérifiez votre connexion ou réessayez plus tard.",
+  "unknown": "Une erreur inattendue s'est produite.",
+  "loadProjectFailed": "Impossible de charger le projet.",
+  "loadProjectsFailed": "Impossible de charger les projets.",
+  "loadHistoryFailed": "Impossible de charger l'historique.",
+  "deleteFailed": "Échec de la suppression."
+}

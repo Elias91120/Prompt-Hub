@@ -1,0 +1,82 @@
+{
+  "createProject": {
+    "title": "New project",
+    "subtitle": "Describe your idea — AI will turn it into a structured plan.",
+    "fields": {
+      "name": "Project name",
+      "namePlaceholder": "My awesome project",
+      "description": "Description",
+      "descriptionPlaceholder": "What does this project do?",
+      "objective": "Objective",
+      "objectivePlaceholder": "The main objective",
+      "stack": "Stack",
+      "stackPlaceholder": "React + FastAPI",
+      "constraints": "Constraints",
+      "constraintsPlaceholder": "Budget, deadlines…",
+      "decisions": "Technical decisions",
+      "decisionsPlaceholder": "Persistent decisions injected into every prompt…",
+      "optional": "optional",
+      "optionalMarkdown": "optional · markdown"
+    },
+    "submit": "Create project",
+    "submitting": "Creating…",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "workspace": {
+    "title": "AI workshop",
+    "subtitleNoPlan": "Build your plan by chatting with the agent or describing it all at once.",
+    "subtitleWithPlan": "Refine your plan via conversation or regenerate it from a complete prompt.",
+    "viewPlan": "View plan",
+    "tabs": {
+      "chat": "Conversation",
+      "prompt": "Quick prompt"
+    },
+    "chat": {
+      "bannerTitleNoPlan": "Guided mode — the agent asks the right questions",
+      "bannerTitleWithPlan": "The plan exists — incremental edits",
+      "bannerNoPlan": "The agent will ask you a few questions to understand your project, then click <em>Generate plan</em> when it has enough information. You can also type <code>go</code> to force generation.",
+      "bannerWithPlan": "Ask the agent to <strong>add</strong>, <strong>rename</strong>, <strong>reorder</strong> or <strong>delete</strong> phases / steps / sub-steps. Your changes preserve the existing plan and can be undone from history. To start over, use the <em>Quick prompt</em> tab."
+    },
+    "prompt": {
+      "bannerTitleNoPlan": "Describe your project all at once",
+      "bannerTitleWithPlan": "Full regeneration — the current plan will be replaced",
+      "bannerNoPlan": "The more precise it is (what, how, scope, constraints), the better the generated plan. You can then refine it via chat.",
+      "bannerWithPlan": "Generates a plan <strong>from scratch</strong> from your prompt. All existing phases / steps / sub-steps will be deleted. To edit the plan without breaking everything, use the <em>Conversation</em> tab instead.",
+      "placeholder": "Ex: AI note-taking web app. Quick capture, auto-generated tags, folder summaries. Stack React + FastAPI + Postgres. MVP shippable in 3 weeks.",
+      "examplesTitle": "Examples — click to pre-fill",
+      "duration": "⏱ Generation usually takes 30 s to 2 min depending on project size.",
+      "generate": "Generate plan",
+      "regenerate": "Regenerate plan",
+      "generating": "Generating…"
+    },
+    "regenerateConfirm": {
+      "title": "Regenerate the plan?",
+      "message": "A plan already exists. All current phases, steps and sub-steps will be replaced. This action can be undone from chat history.",
+      "confirm": "Regenerate",
+      "cancel": "Cancel"
+    },
+    "toasts": {
+      "generated": "Plan generated — opening plan view…",
+      "regenerated": "Plan regenerated."
+    }
+  },
+  "agentsPanel": {
+    "title": "Agents",
+    "subtitle": "Each agent has a declared role and explicit limits. Read-only.",
+    "loading": "Loading…",
+    "close": "Close",
+    "labels": {
+      "inputs": "Inputs",
+      "outputs": "Outputs",
+      "doesNot": "Does NOT"
+    },
+    "kinds": {
+      "planner": "Planner",
+      "generator": "Generator",
+      "analyser": "Analyser",
+      "router": "Router",
+      "summariser": "Summariser"
+    }
+  }
+}

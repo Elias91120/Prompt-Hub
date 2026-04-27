@@ -1,0 +1,82 @@
+{
+  "createProject": {
+    "title": "Nouveau projet",
+    "subtitle": "Décris ton idée — l'IA en fera un plan structuré.",
+    "fields": {
+      "name": "Nom du projet",
+      "namePlaceholder": "Mon super projet",
+      "description": "Description",
+      "descriptionPlaceholder": "Que fait ce projet ?",
+      "objective": "Objectif",
+      "objectivePlaceholder": "L'objectif principal",
+      "stack": "Stack",
+      "stackPlaceholder": "React + FastAPI",
+      "constraints": "Contraintes",
+      "constraintsPlaceholder": "Budget, deadlines…",
+      "decisions": "Décisions techniques",
+      "decisionsPlaceholder": "Décisions persistantes injectées dans chaque prompt…",
+      "optional": "optionnel",
+      "optionalMarkdown": "optionnel · markdown"
+    },
+    "submit": "Créer le projet",
+    "submitting": "Création…",
+    "cancel": "Annuler",
+    "close": "Fermer"
+  },
+  "workspace": {
+    "title": "Atelier IA",
+    "subtitleNoPlan": "Construisez votre plan en discutant avec l'agent ou en décrivant tout d'un coup.",
+    "subtitleWithPlan": "Affinez votre plan via la conversation ou régénérez-le depuis un prompt complet.",
+    "viewPlan": "Voir le plan",
+    "tabs": {
+      "chat": "Conversation",
+      "prompt": "Prompt rapide"
+    },
+    "chat": {
+      "bannerTitleNoPlan": "Mode guidé — l'agent vous pose les bonnes questions",
+      "bannerTitleWithPlan": "Le plan existe — modifications incrémentales",
+      "bannerNoPlan": "L'agent vous posera quelques questions pour comprendre votre projet, puis cliquera sur <em>Générer le plan</em> quand il aura assez d'informations. Vous pouvez aussi écrire <code>go</code> pour forcer la génération.",
+      "bannerWithPlan": "Demandez à l'agent d'<strong>ajouter</strong>, <strong>renommer</strong>, <strong>réorganiser</strong> ou <strong>supprimer</strong> des phases / étapes / sous-étapes. Vos modifications préservent l'existant et peuvent être annulées depuis l'historique. Pour repartir de zéro, utilisez l'onglet <em>Prompt rapide</em>."
+    },
+    "prompt": {
+      "bannerTitleNoPlan": "Décrivez votre projet en une fois",
+      "bannerTitleWithPlan": "Régénération complète — le plan actuel sera remplacé",
+      "bannerNoPlan": "Plus c'est précis (quoi, comment, périmètre, contraintes), meilleur sera le plan généré. Vous pourrez ensuite l'affiner via le chat.",
+      "bannerWithPlan": "Génère un plan <strong>de zéro</strong> à partir de votre prompt. Toutes les phases / étapes / sous-étapes existantes seront supprimées. Pour modifier le plan sans tout casser, utilisez plutôt l'onglet <em>Conversation</em>.",
+      "placeholder": "Ex : application web de prise de notes IA. Capture rapide, tags auto-générés, résumés par dossier. Stack React + FastAPI + Postgres. MVP livrable en 3 semaines.",
+      "examplesTitle": "Exemples — cliquer pour pré-remplir",
+      "duration": "⏱ La génération prend généralement 30 s à 2 min selon la taille du projet.",
+      "generate": "Générer le plan",
+      "regenerate": "Régénérer le plan",
+      "generating": "Génération en cours…"
+    },
+    "regenerateConfirm": {
+      "title": "Régénérer le plan ?",
+      "message": "Un plan existe déjà. Toutes les phases, étapes et sous-étapes actuelles seront remplacées. Cette action peut être annulée depuis l'historique du chat.",
+      "confirm": "Régénérer",
+      "cancel": "Annuler"
+    },
+    "toasts": {
+      "generated": "Plan généré — ouverture de la vue plan…",
+      "regenerated": "Plan régénéré."
+    }
+  },
+  "agentsPanel": {
+    "title": "Agents",
+    "subtitle": "Chaque agent a un rôle déclaré et des limites explicites. Lecture seule.",
+    "loading": "Chargement…",
+    "close": "Fermer",
+    "labels": {
+      "inputs": "Entrées",
+      "outputs": "Sorties",
+      "doesNot": "Ne fait PAS"
+    },
+    "kinds": {
+      "planner": "Planner",
+      "generator": "Generator",
+      "analyser": "Analyser",
+      "router": "Router",
+      "summariser": "Summariser"
+    }
+  }
+}

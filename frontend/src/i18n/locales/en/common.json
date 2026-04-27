@@ -1,0 +1,40 @@
+{
+  "appName": "Prompt Hub",
+  "tagline": "AI workshop to structure your projects",
+  "madeBy": "by Webgen",
+  "language": "Language",
+  "languages": {
+    "fr": "Français",
+    "en": "English"
+  },
+  "actions": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "save": "Save",
+    "create": "Create",
+    "close": "Close",
+    "edit": "Edit",
+    "retry": "Retry",
+    "dismiss": "Dismiss",
+    "open": "Open",
+    "loading": "Loading…",
+    "generating": "Generating…",
+    "next": "Next",
+    "previous": "Previous",
+    "skipToContent": "Skip to main content",
+    "home": "Home",
+    "newProject": "New project"
+  },
+  "breadcrumbs": {
+    "projects": "Projects",
+    "plan": "Plan",
+    "overview": "Project overview"
+  },
+  "loading": {
+    "default": "Loading…",
+    "page": "Loading page…",
+    "project": "Loading project…"
+  }
+}
