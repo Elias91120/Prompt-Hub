@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PageBackground from './PageBackground'
 import LanguageSwitcher from './LanguageSwitcher'
+import UserMenu from '../auth/UserMenu'
 import { Breadcrumbs, type Crumb } from '../ui'
 
 interface AppShellProps {
@@ -43,7 +44,7 @@ export default function AppShell({
       {/* Beta Banner */}
       <div className="bg-gradient-to-r from-[var(--color-surface)] via-[#15803d] to-[var(--color-surface)] px-4 py-2 text-center text-xs font-medium tracking-wide text-white shadow-md sm:text-sm">
         <span className="mr-2 inline-block rounded-md bg-white/20 px-2 py-0.5 uppercase">Beta</span>
-        Environnement de test partagé. Ne pas entrer de données sensibles.
+        100% gratuit pour l'instant — créez un compte pour générer votre premier plan.
         <span className="ml-2 hidden sm:inline text-white/70">
           • Développé avec passion par <strong className="text-white">Webgen</strong>
         </span>
@@ -83,6 +84,7 @@ export default function AppShell({
           <div className="flex items-center gap-2">
             {rightSlot}
             <LanguageSwitcher />
+            <UserMenu />
           </div>
         </div>
         {breadcrumbs && breadcrumbs.length > 0 && (

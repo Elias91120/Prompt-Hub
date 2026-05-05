@@ -20,6 +20,7 @@ from app.agents.chat import ChatResponse  # noqa: E402
 from app.agents.chat_stream import stream_chat_with_agent  # noqa: E402
 from app.agents.feedback import FeedbackAnalysis  # noqa: E402
 from app.agents.prompt import build_user_prompt_from_slice  # noqa: E402
+from app.auth import AuthUser, get_current_user, get_current_user_optional  # noqa: E402
 from app.db import events as project_events  # noqa: E402
 from app.db.models import (  # noqa: E402
     ChatMessageDB,
@@ -87,6 +88,8 @@ def _project_from_db(row: ProjectDB) -> Project:
         objective=row.objective,
         stack=row.stack,
         decisions_log=row.decisions_log,
+        owner_id=row.owner_id,
+        is_demo=bool(row.is_demo),
         phases=[_phase_from_db(p) for p in row.phases],
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -105,6 +108,46 @@ def _load_project(db: Session, project_id: UUID) -> ProjectDB:
     )
     if row is None:
         raise HTTPException(status_code=404, detail="Project not found")
+    return row
+
+
+def _check_read_access(project: ProjectDB, user: AuthUser | None) -> None:
+    """Allow reads for demo projects (anonymous OK) or for the owner.
+
+    Returns ``404`` (not ``403``) when the user is not allowed so we don't
+    leak the existence of private projects to unauthorised callers.
+    """
+    if project.is_demo:
+        return
+    if user is None or project.owner_id != user.id:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
+def _check_write_access(project: ProjectDB, user: AuthUser) -> None:
+    """Mutations require ownership. Demo projects are public read-only."""
+    if project.is_demo:
+        raise HTTPException(
+            status_code=403, detail="Demo projects are read-only."
+        )
+    if project.owner_id != user.id:
+        raise HTTPException(
+            status_code=403, detail="You are not the owner of this project."
+        )
+
+
+def _load_project_for_read(
+    db: Session, project_id: UUID, user: AuthUser | None
+) -> ProjectDB:
+    row = _load_project(db, project_id)
+    _check_read_access(row, user)
+    return row
+
+
+def _load_project_for_write(
+    db: Session, project_id: UUID, user: AuthUser
+) -> ProjectDB:
+    row = _load_project(db, project_id)
+    _check_write_access(row, user)
     return row
 
 
@@ -248,7 +291,11 @@ class PromptHistoryOut(_BaseModel):
 
 
 @router.post("/", response_model=Project, status_code=201)
-def create_project(body: ProjectCreate, db: Session = Depends(get_db)) -> Project:
+def create_project(
+    body: ProjectCreate,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
+) -> Project:
     row = ProjectDB(
         name=body.name,
         description=body.description,
@@ -257,6 +304,8 @@ def create_project(body: ProjectCreate, db: Session = Depends(get_db)) -> Projec
         objective=body.objective,
         stack=body.stack,
         decisions_log=body.decisions_log,
+        owner_id=user.id,
+        is_demo=False,
     )
     db.add(row)
     db.commit()
@@ -265,22 +314,33 @@ def create_project(body: ProjectCreate, db: Session = Depends(get_db)) -> Projec
         db,
         project_id=row.id,
         event_type=project_events.PROJECT_CREATED,
-        payload={"name": row.name},
+        payload={"name": row.name, "owner_id": str(user.id)},
     )
     db.commit()
     return _project_from_db(row)
 
 
 @router.get("/", response_model=list[Project])
-def list_projects(db: Session = Depends(get_db)) -> list[Project]:
-    rows = (
-        db.query(ProjectDB)
-        .options(
-            joinedload(ProjectDB.phases).joinedload(PhaseDB.steps).joinedload(StepDB.sub_steps)
-        )
-        .order_by(ProjectDB.updated_at.desc())
-        .all()
+def list_projects(
+    db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
+) -> list[Project]:
+    """Return the caller's own projects + the public demo projects.
+
+    Anonymous callers see the demo projects only.  Authenticated callers
+    see their own (`owner_id == user.id`) plus all demos, ordered with
+    their projects first.
+    """
+    q = db.query(ProjectDB).options(
+        joinedload(ProjectDB.phases).joinedload(PhaseDB.steps).joinedload(StepDB.sub_steps)
     )
+    if user is None:
+        q = q.filter(ProjectDB.is_demo.is_(True))
+    else:
+        q = q.filter(
+            (ProjectDB.owner_id == user.id) | (ProjectDB.is_demo.is_(True))
+        )
+    rows = q.order_by(ProjectDB.is_demo.asc(), ProjectDB.updated_at.desc()).all()
     # deduplicate rows caused by joinedload cartesian product
     seen: set[UUID] = set()
     unique: list[ProjectDB] = []
@@ -292,14 +352,23 @@ def list_projects(db: Session = Depends(get_db)) -> list[Project]:
 
 
 @router.get("/{project_id}", response_model=Project)
-def get_project(project_id: UUID, db: Session = Depends(get_db)) -> Project:
-    row = _load_project(db, project_id)
+def get_project(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
+) -> Project:
+    row = _load_project_for_read(db, project_id, user)
     return _project_from_db(row)
 
 
 @router.put("/{project_id}", response_model=Project)
-def update_project(project_id: UUID, body: ProjectCreate, db: Session = Depends(get_db)) -> Project:
-    row = _load_project(db, project_id)
+def update_project(
+    project_id: UUID,
+    body: ProjectCreate,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
+) -> Project:
+    row = _load_project_for_write(db, project_id, user)
     row.name = body.name
     row.description = body.description
     row.business_context = body.business_context
@@ -320,8 +389,12 @@ def update_project(project_id: UUID, body: ProjectCreate, db: Session = Depends(
 
 
 @router.delete("/{project_id}", status_code=204)
-def delete_project(project_id: UUID, db: Session = Depends(get_db)) -> None:
-    row = _load_project(db, project_id)
+def delete_project(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
+) -> None:
+    row = _load_project_for_write(db, project_id, user)
     db.delete(row)
     db.commit()
 
@@ -336,9 +409,9 @@ def list_project_events(
     step_id: UUID | None = None,
     limit: int = 200,
     db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
 ) -> list[ProjectEventOut]:
-    # Confirm project exists (404 if not)
-    _load_project(db, project_id)
+    _load_project_for_read(db, project_id, user)
     q = db.query(ProjectEventDB).filter(ProjectEventDB.project_id == project_id)
     if step_id is not None:
         q = q.filter(ProjectEventDB.step_id == step_id)
@@ -355,6 +428,7 @@ def revert_event(
     project_id: UUID,
     event_id: UUID,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> Project:
     """Restore the plan to the snapshot captured just before ``event_id``.
 
@@ -363,7 +437,7 @@ def revert_event(
     surgical edits were applied. Reverting wipes the current plan and
     re-creates it from the snapshot (UUIDs preserved when possible).
     """
-    project = _load_project(db, project_id)
+    project = _load_project_for_write(db, project_id, user)
     event = db.get(ProjectEventDB, event_id)
     if event is None or event.project_id != project_id:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -406,8 +480,9 @@ async def generate_project_plan(
     project_id: UUID,
     body: GeneratePlanBody | None = None,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> Project:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
 
     # Build ProjectCreate from existing row for the agent
     project_input = ProjectCreate(
@@ -478,9 +553,12 @@ async def generate_project_plan(
     summary="Generate an implementation prompt for a step",
 )
 async def generate_step_prompt(
-    project_id: UUID, step_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    step_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> dict:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
 
     target_phase, target_step = _find_step(project, step_id)
@@ -533,9 +611,12 @@ async def generate_step_prompt(
     summary="Return the assembled context that would be sent to the prompt agent (no LLM call)",
 )
 def preview_prompt_context(
-    project_id: UUID, step_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    step_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
 ) -> dict:
-    row = _load_project(db, project_id)
+    row = _load_project_for_read(db, project_id, user)
     project = _project_from_db(row)
 
     target_phase, target_step = _find_step(project, step_id)
@@ -577,8 +658,9 @@ async def analyse_step_feedback(
     step_id: UUID,
     body: FeedbackBody,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> FeedbackAnalysis:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
 
     target_phase, target_step = _find_step(project, step_id)
@@ -606,13 +688,14 @@ async def apply_step_feedback(
     step_id: UUID,
     body: FeedbackBody,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> ApplyFeedbackResponse:
     """Run feedback analysis, save it to the feedback memory table,
     and transition the step status:
       - step_complete=True  → status becomes "completed"
       - step_complete=False → status becomes "in_progress" (work remaining)
     """
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
 
     target_phase, target_step = _find_step(project, step_id)
@@ -675,7 +758,9 @@ def update_step_status(
     step_id: UUID,
     body: StepStatusUpdate,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> Project:
+    _load_project_for_write(db, project_id, user)
     step_row = _find_step_db(db, project_id, step_id)
     previous_status = step_row.status
     step_row.status = body.status.value
@@ -710,11 +795,12 @@ async def generate_step_sub_steps(
     step_id: UUID,
     body: GenerateSubStepsBody | None = None,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> Project:
     """Break a parent step down into 2-6 actionable sub-steps using the
     sub-steps agent. Existing sub-steps are replaced.
     """
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
 
     target_phase, target_step = _find_step(project, step_id)
@@ -807,8 +893,9 @@ def list_chat_history(
     project_id: UUID,
     limit: int = 200,
     db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
 ) -> list[ChatHistoryItem]:
-    _load_project(db, project_id)
+    _load_project_for_read(db, project_id, user)
     rows = (
         db.query(ChatMessageDB)
         .filter(ChatMessageDB.project_id == project_id)
@@ -824,8 +911,12 @@ def list_chat_history(
     status_code=204,
     summary="Wipe the persisted chat history for a project",
 )
-def clear_chat_history(project_id: UUID, db: Session = Depends(get_db)) -> None:
-    _load_project(db, project_id)
+def clear_chat_history(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
+) -> None:
+    _load_project_for_write(db, project_id, user)
     db.query(ChatMessageDB).filter(ChatMessageDB.project_id == project_id).delete()
     db.commit()
 
@@ -838,9 +929,9 @@ async def project_chat(
     project_id: UUID,
     body: ChatBody,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> dict:
-    # Load project for context
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
 
     # Build project context string
@@ -925,6 +1016,7 @@ async def project_chat_stream(
     project_id: UUID,
     body: ChatBody,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> StreamingResponse:
     """SSE variant of :func:`project_chat`.
 
@@ -941,7 +1033,7 @@ async def project_chat_stream(
     """
     from app.agents.chat import _extract_json  # local import: same module
 
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
 
     project_context = (
@@ -1224,8 +1316,12 @@ async def _regenerate_phase(row: ProjectDB, op) -> list[str]:
     response_model=list[ProjectSkill],
     summary="List all skills for a project",
 )
-def list_skills(project_id: UUID, db: Session = Depends(get_db)) -> list[ProjectSkill]:
-    _load_project(db, project_id)
+def list_skills(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
+) -> list[ProjectSkill]:
+    _load_project_for_read(db, project_id, user)
     return _load_skills(db, project_id)
 
 
@@ -1239,8 +1335,9 @@ def create_skill(
     project_id: UUID,
     body: ProjectSkillCreate,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> ProjectSkill:
-    _load_project(db, project_id)
+    _load_project_for_write(db, project_id, user)
     row = ProjectSkillDB(
         project_id=project_id,
         name=body.name,
@@ -1264,7 +1361,9 @@ def update_skill(
     skill_id: UUID,
     body: ProjectSkillCreate,
     db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> ProjectSkill:
+    _load_project_for_write(db, project_id, user)
     row = (
         db.query(ProjectSkillDB)
         .filter(ProjectSkillDB.id == skill_id, ProjectSkillDB.project_id == project_id)
@@ -1288,8 +1387,12 @@ def update_skill(
     summary="Delete a project skill",
 )
 def delete_skill(
-    project_id: UUID, skill_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    skill_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> None:
+    _load_project_for_write(db, project_id, user)
     row = (
         db.query(ProjectSkillDB)
         .filter(ProjectSkillDB.id == skill_id, ProjectSkillDB.project_id == project_id)
@@ -1316,8 +1419,9 @@ def list_step_prompts(
     step_id: UUID,
     limit: int = 20,
     db: Session = Depends(get_db),
+    user: AuthUser | None = Depends(get_current_user_optional),
 ) -> list[PromptHistoryOut]:
-    _load_project(db, project_id)
+    _load_project_for_read(db, project_id, user)
     rows = (
         db.query(PromptHistoryDB)
         .filter(
@@ -1353,9 +1457,11 @@ from app.agents.analyse import (  # noqa: E402
     summary="Audit the plan for gaps, duplicates, ordering issues (read-only)",
 )
 async def analyse_plan_endpoint(
-    project_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> PlanConsistencyReport:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
     if not project.phases:
         raise HTTPException(status_code=400, detail="Project has no plan to analyse")
@@ -1372,9 +1478,11 @@ async def analyse_plan_endpoint(
     summary="Recommend the next step to attack (read-only, advisory only)",
 )
 async def analyse_next_step_endpoint(
-    project_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> NextStepRecommendation:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
     if not project.phases:
         raise HTTPException(status_code=400, detail="Project has no plan")
@@ -1391,9 +1499,12 @@ async def analyse_next_step_endpoint(
     summary="Identify risks for a single step (read-only)",
 )
 async def analyse_step_risks_endpoint(
-    project_id: UUID, step_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    step_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> StepRiskReport:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
     target_phase, target_step = _find_step(project, step_id)
     if target_step is None or target_phase is None:
@@ -1419,9 +1530,11 @@ from app.agents.recap import ProjectRecap  # noqa: E402
     summary="Generate a short factual recap of project state (read-only)",
 )
 async def project_recap_endpoint(
-    project_id: UUID, db: Session = Depends(get_db)
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthUser = Depends(get_current_user),
 ) -> ProjectRecap:
-    row = _load_project(db, project_id)
+    row = _load_project_for_write(db, project_id, user)
     project = _project_from_db(row)
     try:
         return await summarise_project(project)

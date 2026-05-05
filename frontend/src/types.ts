@@ -28,6 +28,10 @@ export interface Project {
   objective: string
   stack: string | null
   decisions_log: string | null
+  /** Supabase auth.users.id of the owner (null for legacy/demo). */
+  owner_id: string | null
+  /** Public read-only demo project, listed for everyone. */
+  is_demo: boolean
   phases: Phase[]
   created_at: string
   updated_at: string

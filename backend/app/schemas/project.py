@@ -51,6 +51,14 @@ class Project(BaseModel):
     objective: str = Field(..., min_length=1)
     stack: str | None = None
     decisions_log: str | None = None
+    owner_id: UUID | None = Field(
+        default=None,
+        description="Supabase auth.users.id of the owner (None for legacy/demo).",
+    )
+    is_demo: bool = Field(
+        default=False,
+        description="Public read-only demo project, listed for everyone.",
+    )
     phases: list[Phase] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=_utc_now)
     updated_at: datetime = Field(default_factory=_utc_now)

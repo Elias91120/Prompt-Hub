@@ -5,3 +5,4 @@ pydantic-ai-slim[openai]>=0.0.40
 sqlalchemy>=2.0
 openai>=1.0
 psycopg2-binary>=2.9
+pyjwt[crypto]>=2.8

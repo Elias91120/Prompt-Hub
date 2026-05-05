@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, Uuid
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -22,6 +22,12 @@ class ProjectDB(Base):
     objective: Mapped[str] = mapped_column(String, nullable=False)
     stack: Mapped[str | None] = mapped_column(String, nullable=True)
     decisions_log: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Supabase auth.users.id of the project owner. NULL for legacy/demo
+    # projects that predate the introduction of authentication.
+    owner_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, nullable=True, index=True)
+    # Public read-only demo projects shown to anonymous visitors and
+    # listed alongside the user's own projects once signed in.
+    is_demo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utc_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utc_now, onupdate=_utc_now

@@ -24,6 +24,7 @@ import frPlan from './locales/fr/plan.json'
 import frErrors from './locales/fr/errors.json'
 import frMarketing from './locales/fr/marketing.json'
 import frEditor from './locales/fr/editor.json'
+import frAuth from './locales/fr/auth.json'
 
 import enCommon from './locales/en/common.json'
 import enHome from './locales/en/home.json'
@@ -32,6 +33,7 @@ import enPlan from './locales/en/plan.json'
 import enErrors from './locales/en/errors.json'
 import enMarketing from './locales/en/marketing.json'
 import enEditor from './locales/en/editor.json'
+import enAuth from './locales/en/auth.json'
 
 export const SUPPORTED_LANGS = ['fr', 'en'] as const
 export type Lang = (typeof SUPPORTED_LANGS)[number]
@@ -43,7 +45,7 @@ void i18n
     fallbackLng: 'fr',
     supportedLngs: SUPPORTED_LANGS,
     defaultNS: 'common',
-    ns: ['common', 'home', 'overview', 'plan', 'errors', 'marketing', 'editor'],
+    ns: ['common', 'home', 'overview', 'plan', 'errors', 'marketing', 'editor', 'auth'],
     interpolation: { escapeValue: false }, // React already escapes
     detection: {
       order: ['localStorage', 'navigator'],
@@ -59,6 +61,7 @@ void i18n
         errors: frErrors,
         marketing: frMarketing,
         editor: frEditor,
+        auth: frAuth,
       },
       en: {
         common: enCommon,
@@ -68,6 +71,7 @@ void i18n
         errors: enErrors,
         marketing: enMarketing,
         editor: enEditor,
+        auth: enAuth,
       },
     },
   })

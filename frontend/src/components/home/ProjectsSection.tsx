@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Sparkles, Trash2, FolderPlus, FolderOpen } from 'lucide-react'
+import { Sparkles, Trash2, FolderPlus, FolderOpen, BookOpen, Eye } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Project } from '../../types'
 import { ErrorBanner, Skeleton } from '../ui'
@@ -8,6 +8,9 @@ interface Props {
   projects: Project[]
   loading: boolean
   error: string | null
+  /** Whether a Supabase session is active. Controls section title,
+   *  the empty state, and whether the delete button is shown on cards. */
+  isAuthed: boolean
   onSelectProject: (project: Project) => void
   onCreate: () => void
   onDelete: (projectId: string) => void
@@ -42,6 +45,7 @@ export default function ProjectsSection({
   projects,
   loading,
   error,
+  isAuthed,
   onSelectProject,
   onCreate,
   onDelete,
@@ -50,22 +54,28 @@ export default function ProjectsSection({
   onRequestDelete,
 }: Props) {
   const { t } = useTranslation('home')
+
+  const ownProjects = projects.filter((p) => !p.is_demo)
+  const demoProjects = projects.filter((p) => p.is_demo)
+
   return (
     <section id="projects" className="relative px-6 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="eyebrow mb-3">{t('projects.sectionTitle')}</span>
+            <span className="eyebrow mb-3">
+              {isAuthed ? t('projects.sectionTitle') : t('projects.demoEyebrow')}
+            </span>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              {t('projects.sectionTitle')}
+              {isAuthed ? t('projects.sectionTitle') : t('projects.demoTitle')}
             </h2>
             <p className="mt-2 text-[var(--color-text-secondary)]">
-              {t('projects.sectionSubtitle')}
+              {isAuthed ? t('projects.sectionSubtitle') : t('projects.demoSubtitle')}
             </p>
           </div>
           <button onClick={onCreate} className="btn-primary self-start sm:self-auto">
             <FolderPlus className="h-4 w-4" />
-            {t('common:actions.newProject')}
+            {isAuthed ? t('common:actions.newProject') : t('projects.signupCta')}
           </button>
         </div>
 
@@ -75,10 +85,11 @@ export default function ProjectsSection({
               <Sparkles className="h-3 w-3" />
             </div>
             <div>
-              <strong className="text-emerald-400">Mode Beta - Compte partagé</strong>
+              <strong className="text-emerald-400">
+                {isAuthed ? t('projects.banner.titleAuthed') : t('projects.banner.titleAnon')}
+              </strong>
               <p className="mt-1">
-                Afin de faciliter les tests et de recueillir vos avis, Prompt Hub est actuellement en accès libre sans création de compte. 
-                <strong className="text-[var(--color-text-primary)]"> Tous les projets créés ici sont visibles par l'ensemble des testeurs.</strong> Merci de ne pas inclure de données confidentielles ou sensibles.
+                {isAuthed ? t('projects.banner.bodyAuthed') : t('projects.banner.bodyAnon')}
               </p>
             </div>
           </div>
@@ -103,38 +114,115 @@ export default function ProjectsSection({
               <Skeleton key={i} className="h-[180px] w-full rounded-2xl" />
             ))}
           </div>
-        ) : projects.length === 0 ? (
-          <EmptyState onCreate={onCreate} />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((p, idx) => (
-              <ProjectCard
-                key={p.id}
-                project={p}
-                index={idx}
-                onSelect={() => onSelectProject(p)}
-                onDelete={() =>
-                  onRequestDelete ? onRequestDelete(p) : onDelete(p.id)
-                }
+          <>
+            {isAuthed && (
+              <ProjectGrid
+                title={t('projects.ownTitle')}
+                emptyState={<EmptyState onCreate={onCreate} />}
+                projects={ownProjects}
+                isAuthed
+                onSelectProject={onSelectProject}
+                onDelete={onDelete}
+                onRequestDelete={onRequestDelete}
               />
-            ))}
-          </div>
+            )}
+
+            {demoProjects.length > 0 && (
+              <div className={isAuthed ? 'mt-12' : ''}>
+                {isAuthed && (
+                  <div className="mb-5 flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                      {t('projects.demoSectionTitle')}
+                    </h3>
+                    <span className="text-xs text-[var(--color-text-tertiary)]">
+                      · {t('projects.demoSectionHint')}
+                    </span>
+                  </div>
+                )}
+                <ProjectGrid
+                  projects={demoProjects}
+                  isAuthed={isAuthed}
+                  isDemoGrid
+                  onSelectProject={onSelectProject}
+                  onDelete={onDelete}
+                  onRequestDelete={onRequestDelete}
+                />
+              </div>
+            )}
+
+            {!isAuthed && demoProjects.length === 0 && (
+              <EmptyState onCreate={onCreate} />
+            )}
+          </>
         )}
       </div>
     </section>
   )
 }
 
+function ProjectGrid({
+  title,
+  emptyState,
+  projects,
+  isAuthed,
+  isDemoGrid,
+  onSelectProject,
+  onDelete,
+  onRequestDelete,
+}: {
+  title?: string
+  emptyState?: React.ReactNode
+  projects: Project[]
+  isAuthed: boolean
+  isDemoGrid?: boolean
+  onSelectProject: (project: Project) => void
+  onDelete: (projectId: string) => void
+  onRequestDelete?: (project: Project) => void
+}) {
+  if (projects.length === 0 && emptyState) return <>{emptyState}</>
+  if (projects.length === 0) return null
+  return (
+    <div>
+      {title && (
+        <h3 className="mb-5 text-sm font-semibold text-[var(--color-text-primary)]">
+          {title}
+        </h3>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {projects.map((p, idx) => (
+          <ProjectCard
+            key={p.id}
+            project={p}
+            index={idx}
+            canDelete={isAuthed && !p.is_demo}
+            onSelect={() => onSelectProject(p)}
+            onDelete={() =>
+              onRequestDelete ? onRequestDelete(p) : onDelete(p.id)
+            }
+            isDemoGrid={isDemoGrid}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ProjectCard({
   project,
   index,
+  canDelete,
   onSelect,
   onDelete,
+  isDemoGrid,
 }: {
   project: Project
   index: number
+  canDelete: boolean
   onSelect: () => void
   onDelete: () => void
+  isDemoGrid?: boolean
 }) {
   const totalSteps = project.phases.reduce(
     (n, ph) => n + ph.steps.reduce((m, s) => m + 1 + s.sub_steps.length, 0),
@@ -172,19 +260,27 @@ function ProjectCard({
         <span className="kpi-icon">
           <Sparkles className="h-4 w-4" />
         </span>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            // Parent owns the confirmation flow (ConfirmDialog).
-            onDelete()
-          }}
-          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-text-tertiary)] opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100 focus-visible:opacity-100"
-          aria-label={`Supprimer ${project.name}`}
-          title="Supprimer le projet"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+        {canDelete ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete()
+            }}
+            className="relative z-10 flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-text-tertiary)] opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100 focus-visible:opacity-100"
+            aria-label={`Supprimer ${project.name}`}
+            title="Supprimer le projet"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          isDemoGrid && (
+            <span className="badge badge-neutral text-[10px]">
+              <Eye className="h-2.5 w-2.5" />
+              Démo · lecture
+            </span>
+          )
+        )}
       </div>
 
       <h3 className="relative mt-4 text-sm font-semibold text-[var(--color-text-primary)]">
@@ -248,7 +344,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
         <p className="mt-3 max-w-md text-sm leading-relaxed text-[var(--color-text-secondary)]">
           {t('projects.empty.description')}
         </p>
-        
+
         <div className="mt-8 grid max-w-lg gap-4 text-left sm:grid-cols-2">
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/50 p-4">
             <h4 className="text-sm font-semibold text-emerald-400">1. Décrivez</h4>

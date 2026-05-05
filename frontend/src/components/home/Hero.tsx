@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, FolderPlus, Sparkles } from 'lucide-react'
+import { ArrowRight, FolderPlus, Sparkles, UserPlus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 interface Props {
+  isAuthed: boolean
   onCreate: () => void
   onScrollToProjects: () => void
 }
 
-export default function Hero({ onCreate, onScrollToProjects }: Props) {
+export default function Hero({ isAuthed, onCreate, onScrollToProjects }: Props) {
   const { t } = useTranslation('home')
   return (
     <section
@@ -44,8 +45,17 @@ export default function Hero({ onCreate, onScrollToProjects }: Props) {
 
           <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
             <button onClick={onCreate} className="btn-primary">
-              <FolderPlus className="h-4 w-4" />
-              {t('hero.ctaPrimary')}
+              {isAuthed ? (
+                <>
+                  <FolderPlus className="h-4 w-4" />
+                  {t('hero.ctaPrimaryAuthed')}
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4" />
+                  {t('hero.ctaPrimaryAnon')}
+                </>
+              )}
             </button>
             <button onClick={onScrollToProjects} className="btn-secondary">
               {t('hero.ctaSecondary')}
@@ -56,11 +66,11 @@ export default function Hero({ onCreate, onScrollToProjects }: Props) {
           <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-xs text-[var(--color-text-tertiary)]">
             <span className="badge badge-success">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
-              {t('hero.badges.local')}
+              {t('hero.badges.free')}
             </span>
             <span className="badge badge-neutral">{t('hero.badges.vllm')}</span>
             <span className="badge badge-neutral">{t('hero.badges.agents')}</span>
-            <span className="badge badge-neutral">{t('hero.badges.oss')}</span>
+            <span className="badge badge-neutral">{t('hero.badges.local')}</span>
           </div>
         </motion.div>
       </div>

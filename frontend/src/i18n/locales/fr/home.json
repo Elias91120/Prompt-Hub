@@ -5,18 +5,32 @@
     "titleHighlight": "plan d'exécution",
     "title2": "prêt à coder.",
     "subtitle": "Prompt Hub structure votre projet en phases et étapes, génère des prompts contextualisés pour chaque tâche, et orchestre une équipe d'agents IA spécialisés pour vous aider à avancer.",
-    "ctaPrimary": "Créer un projet",
-    "ctaSecondary": "Voir mes projets",
+    "ctaPrimaryAuthed": "Créer un projet",
+    "ctaPrimaryAnon": "S'inscrire gratuitement",
+    "ctaSecondary": "Voir l'exemple",
     "badges": {
+      "free": "100% gratuit pour l'instant",
       "local": "Mistral AI",
       "vllm": "Cloud-ready",
-      "agents": "7+ agents spécialisés",
-      "oss": "Open source"
+      "agents": "7+ agents spécialisés"
     }
   },
   "projects": {
     "sectionTitle": "Vos projets",
     "sectionSubtitle": "Reprenez là où vous vous êtes arrêté ou démarrez un nouveau plan.",
+    "ownTitle": "Vos projets",
+    "demoEyebrow": "Exemples publics",
+    "demoTitle": "Projets démo",
+    "demoSubtitle": "Explorez en lecture seule des projets créés en mode beta. Pour générer le vôtre, créez un compte gratuit.",
+    "demoSectionTitle": "Projets démo",
+    "demoSectionHint": "lecture seule, accessibles à tous",
+    "signupCta": "S'inscrire gratuitement",
+    "banner": {
+      "titleAuthed": "Beta · 100% gratuit pour l'instant",
+      "bodyAuthed": "Vos projets sont privés et liés à votre compte. Le service est gratuit pendant la beta — aucune carte requise.",
+      "titleAnon": "Beta · 100% gratuit pour l'instant",
+      "bodyAnon": "Pour créer votre propre plan, inscrivez-vous gratuitement. Vos projets seront privés et liés à votre compte. Les exemples ci-dessous sont publics et en lecture seule."
+    },
     "empty": {
       "title": "Aucun projet pour le moment",
       "description": "Créez votre premier projet et laissez les agents IA structurer votre plan d'attaque en quelques secondes.",

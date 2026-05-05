@@ -1,8 +1,13 @@
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, FolderPlus } from 'lucide-react'
+import { ArrowRight, FolderPlus, UserPlus } from 'lucide-react'
 
-export default function CTASection({ onCreate }: { onCreate: () => void }) {
+interface Props {
+  isAuthed: boolean
+  onCreate: () => void
+}
+
+export default function CTASection({ isAuthed, onCreate }: Props) {
   const { t } = useTranslation('marketing')
   return (
     <section className="relative px-6 py-20 sm:py-24">
@@ -19,16 +24,29 @@ export default function CTASection({ onCreate }: { onCreate: () => void }) {
             className="absolute inset-x-0 -top-20 mx-auto h-40 w-40 rounded-full bg-[var(--color-accent)]/30 blur-3xl"
           />
           <div className="relative">
+            <span className="badge badge-success mb-4">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+              {t('cta.freeBadge')}
+            </span>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              {t('cta.title')}
+              {isAuthed ? t('cta.title') : t('cta.titleAnon')}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-[var(--color-text-secondary)]">
-              {t('cta.subtitle')}
+              {isAuthed ? t('cta.subtitle') : t('cta.subtitleAnon')}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <button onClick={onCreate} className="btn-primary">
-                <FolderPlus className="h-4 w-4" />
-                {t('cta.primary')}
+                {isAuthed ? (
+                  <>
+                    <FolderPlus className="h-4 w-4" />
+                    {t('cta.primary')}
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="h-4 w-4" />
+                    {t('cta.primaryAnon')}
+                  </>
+                )}
               </button>
               <a href="#features" className="btn-ghost">
                 {t('cta.secondary')}

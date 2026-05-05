@@ -16,6 +16,7 @@ import type {
   StepRiskReport,
   StepStatus,
 } from './types'
+import { currentAccessToken } from './lib/auth'
 
 const BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -33,10 +34,27 @@ export class LLMUnreachableError extends Error {
   }
 }
 
+/** Build the default request headers, including a Supabase Bearer token
+ * if a session is active. The backend treats Auth as optional on read
+ * endpoints (so anonymous browsers can still see demo projects) and
+ * required on every mutation. */
+async function buildHeaders(extra?: HeadersInit): Promise<HeadersInit> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const token = await currentAccessToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+  if (extra) {
+    for (const [k, v] of Object.entries(extra as Record<string, string>)) {
+      headers[k] = v
+    }
+  }
+  return headers
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const headers = await buildHeaders(init?.headers)
   const res = await fetch(`${BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...init,
+    headers,
   })
   if (!res.ok) {
     const body = await res.text()
@@ -52,10 +70,11 @@ async function llmRequest<T>(url: string, init: RequestInit = {}): Promise<T> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS)
   try {
+    const headers = await buildHeaders(init.headers)
     const res = await fetch(`${BASE}${url}`, {
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
       ...init,
+      headers,
+      signal: controller.signal,
     })
     if (res.status === 502 || res.status === 503 || res.status === 504) {
       throw new LLMUnreachableError(`AI service responded with ${res.status}`)
@@ -98,6 +117,7 @@ export function createProject(data: ProjectCreate): Promise<Project> {
 export async function deleteProject(id: string): Promise<void> {
   const res = await fetch(`${BASE}/projects/${id}`, {
     method: 'DELETE',
+    headers: await buildHeaders(),
   })
   if (!res.ok) {
     const body = await res.text()
@@ -236,6 +256,7 @@ export function updateSkill(
 export async function deleteSkill(projectId: string, skillId: string): Promise<void> {
   const res = await fetch(`${BASE}/projects/${projectId}/skills/${skillId}`, {
     method: 'DELETE',
+    headers: await buildHeaders(),
   })
   if (!res.ok) {
     const body = await res.text()
@@ -320,7 +341,7 @@ export async function chatMessageStream(
 ): Promise<ChatResponse> {
   const res = await fetch(`${BASE}/projects/${projectId}/chat/stream`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await buildHeaders(),
     body: JSON.stringify({
       message,
       history,
@@ -394,6 +415,7 @@ export function listChatHistory(
 export async function clearChatHistory(projectId: string): Promise<void> {
   const res = await fetch(`${BASE}/projects/${projectId}/chat/history`, {
     method: 'DELETE',
+    headers: await buildHeaders(),
   })
   if (!res.ok) {
     const body = await res.text()

@@ -102,10 +102,35 @@
       }
     }
   },
+  "sample": {
+    "eyebrow": "Exemple concret",
+    "title": "Voici à quoi ressemble",
+    "titleHighlight": "un plan généré.",
+    "subtitle": "Un cas réel : « TaskFlow », un SaaS de gestion de tâches en équipe. Cliquez sur une étape pour voir son objectif, et copiez le prompt prêt-à-coller que Prompt Hub génère automatiquement.",
+    "demoLabel": "Projet d'exemple — non modifiable",
+    "generated": "Généré par Prompt Hub",
+    "generatedHint": "Plan + prompts en moins de 60 secondes",
+    "stepsCount": "étapes",
+    "statusDone": "Fait",
+    "statusInProgress": "En cours",
+    "promptTitle": "Prompt prêt à coller",
+    "promptSubtitle": "Étape : Authentification email + vérification",
+    "promptFooter": "Inclut automatiquement contexte projet, stack, décisions et compétences.",
+    "copy": "Copier",
+    "copied": "Copié",
+    "ctaCopyAuthed": "Lancez votre propre plan en quelques minutes.",
+    "ctaCopyAnon": "Inscrivez-vous gratuitement pour générer votre propre plan.",
+    "ctaButtonAuthed": "Créer mon projet",
+    "ctaButtonAnon": "S'inscrire gratuitement"
+  },
   "cta": {
+    "freeBadge": "100% gratuit pour l'instant",
     "title": "Prêt à structurer votre prochain projet ?",
     "subtitle": "Lancez Prompt Hub et obtenez un plan d'exécution complet en quelques minutes — pas en quelques jours.",
+    "titleAnon": "Créez votre compte et générez votre premier plan",
+    "subtitleAnon": "Inscription en 30 secondes avec vérification d'email. Aucune carte requise — c'est gratuit pendant la beta.",
     "primary": "Démarrer un projet",
+    "primaryAnon": "S'inscrire gratuitement",
     "secondary": "Découvrir les fonctionnalités"
   },
   "footer": {
