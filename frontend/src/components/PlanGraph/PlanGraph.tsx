@@ -210,7 +210,7 @@ function PlanGraphInner({ project, selectedStepId, onSelectStep, flashStepNames 
         position="bottom-right"
         pannable
         zoomable
-        className="plan-graph-minimap"
+        className="plan-graph-minimap max-md:hidden"
         nodeColor={(n) => {
           if (n.type === 'phase') return 'var(--color-surface-hover)'
           const status = (n.data as { step?: { status?: string } })?.step?.status ?? 'not_started'

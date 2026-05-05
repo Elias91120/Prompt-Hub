@@ -126,9 +126,9 @@ export default function ProjectOverviewPage({
       backLabel={t('breadcrumbs.projects')}
       breadcrumbs={[{ label: t('breadcrumbs.projects'), to: '/' }, { label: project.name }]}
     >
-      <div className="mx-auto w-full max-w-6xl px-6 py-8 sm:py-12">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-12">
         {/* HEADER SECTION */}
-        <header className="mb-10 flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="mb-8 flex flex-col items-stretch gap-6 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/10 px-3 py-1 mb-4">
               <Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" />
@@ -144,11 +144,11 @@ export default function ProjectOverviewPage({
             </p>
           </div>
 
-          <div className="shrink-0">
+          <div className="shrink-0 w-full sm:w-auto">
             {hasPlan ? (
               <button
                 onClick={() => onOpenPlan(project)}
-                className="group relative inline-flex items-center gap-3 rounded-2xl bg-[var(--color-accent)] px-6 py-3.5 text-sm font-bold text-black shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all hover:scale-105 hover:bg-[var(--color-accent-hover)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
+                className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-[var(--color-accent)] px-6 py-3.5 text-sm font-bold text-black shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all hover:scale-[1.02] hover:bg-[var(--color-accent-hover)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] sm:inline-flex sm:w-auto sm:hover:scale-105"
               >
                 Ouvrir le Plan Visuel
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -158,7 +158,7 @@ export default function ProjectOverviewPage({
         </header>
 
         {/* TABS SELECTOR */}
-        <div className="mb-8 flex gap-6 border-b border-[var(--color-border)]">
+        <div className="mb-6 flex gap-4 overflow-x-auto border-b border-[var(--color-border)] pb-px sm:mb-8 sm:gap-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`pb-4 text-sm font-bold transition-all ${
@@ -275,9 +275,13 @@ export default function ProjectOverviewPage({
 
             {/* RIGHT COLUMN: AI Workspace (Chat) - COLLAPSIBLE */}
             <div className="lg:col-span-8">
-              <div className={`glass-card flex flex-col overflow-hidden transition-all duration-300 ${chatExpanded ? 'min-h-[480px]' : 'min-h-0'}`} id="workspace" style={{ padding: 0 }}>
+              <div
+                className={`glass-card flex flex-col overflow-hidden transition-all duration-300 ${chatExpanded ? 'min-h-[min(480px,calc(100dvh-11rem))] sm:min-h-[480px]' : 'min-h-0'}`}
+                id="workspace"
+                style={{ padding: 0 }}
+              >
                 <div 
-                  className="flex cursor-pointer items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-3 transition-colors hover:bg-[var(--color-surface-hover)]"
+                  className="flex cursor-pointer items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-colors hover:bg-[var(--color-surface-hover)] sm:px-6"
                   onClick={() => setChatExpanded(!chatExpanded)}
                 >
                   <div className="flex items-center gap-3">

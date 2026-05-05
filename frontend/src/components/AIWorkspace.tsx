@@ -85,7 +85,7 @@ export default function AIWorkspace({
     <section className={minimal ? "" : "surface-card overflow-hidden"}>
       {/* ── Header ── */}
       {!minimal && (
-        <div className="border-b border-[var(--color-border)] px-6 py-5">
+        <div className="border-b border-[var(--color-border)] px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
               <span className="kpi-icon">
@@ -109,7 +109,7 @@ export default function AIWorkspace({
           </div>
 
           {/* Tabs */}
-          <div className="mt-4 inline-flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1">
+          <div className="mt-4 inline-flex max-w-full overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1 [scrollbar-width:thin]">
             <TabButton
               active={tab === 'chat'}
               onClick={() => setTab('chat')}
@@ -128,8 +128,8 @@ export default function AIWorkspace({
 
       {/* ── Body ── */}
       {minimal && (
-        <div className="px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-surface-raised)]">
-           <div className="inline-flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1">
+        <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 sm:px-6 sm:py-4">
+           <div className="inline-flex max-w-full overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1 [scrollbar-width:thin]">
             <TabButton
               active={tab === 'chat'}
               onClick={() => setTab('chat')}
@@ -166,7 +166,7 @@ export default function AIWorkspace({
       )}
 
       {error && (
-        <div className="border-t border-red-500/30 bg-red-500/10 px-6 py-3 text-xs text-red-300">
+        <div className="border-t border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-300 sm:px-6">
           {error}
         </div>
       )}
@@ -259,8 +259,8 @@ function ChatTab({
         )}
       </ExplainBanner>
 
-      {/* ChatPanel needs a bounded height because its inner scroller uses h-full */}
-      <div className="flex flex-col" style={{ height: '480px' }}>
+      {/* Hauteur adaptée au viewport sur mobile (évite un chat trop haut ou trop bas) */}
+      <div className="flex h-[min(480px,calc(100dvh-12rem))] min-h-[260px] flex-col sm:h-[480px] sm:min-h-0">
         <ChatPanel
           key={projectId + ':' + (hasPlan ? 'plan' : 'noplan')}
           projectId={projectId}
@@ -293,7 +293,7 @@ function PromptTab({
 }) {
   const { t } = useTranslation('editor')
   return (
-    <div className="flex flex-col gap-4 px-6 py-5">
+    <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5">
       <ExplainBanner
         tone={hasPlan ? 'warning' : 'info'}
         icon={
@@ -396,7 +396,7 @@ function ExplainBanner({
     warning: 'text-amber-300',
   }[tone]
   return (
-    <div className={`mx-6 mt-5 flex gap-3 rounded-xl border ${toneClasses} px-4 py-3`}>
+    <div className={`mx-4 mt-4 flex gap-3 rounded-xl border sm:mx-6 sm:mt-5 ${toneClasses} px-3 py-3 sm:px-4`}>
       <span className={`mt-0.5 shrink-0 ${iconColor}`}>{icon}</span>
       <div className="text-[12px] leading-relaxed">
         <p className="font-semibold text-[var(--color-text-primary)]">{title}</p>

@@ -39,7 +39,7 @@ export default function PlanPage({
   const [generating, setGenerating] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
   const toast = useToast()
-  const { t } = useTranslation('plan')
+  const { t } = useTranslation(['plan', 'overview'])
 
   /**
    * Wrap setSelectedStep so the URL stays in sync (deep-link friendly).
@@ -322,12 +322,12 @@ export default function PlanPage({
     <div className="flex h-screen flex-col bg-[var(--color-surface)]">
       {/* ── Header ── */}
       <header className="border-b border-[var(--color-border)] bg-[var(--color-surface-raised)]">
-        <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-4">
-          {/* Back button */}
+        {/* Ligne 1 : retour + identité (+ stats compactes sur mobile) */}
+        <div className="flex items-start gap-2 px-4 py-3 sm:items-center sm:gap-3 sm:px-6 sm:py-4">
           <button
             onClick={onBack}
             aria-label={t('common:actions.back')}
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]"
+            className="mt-0.5 flex shrink-0 items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] sm:mt-0 sm:px-3"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
@@ -338,23 +338,21 @@ export default function PlanPage({
                 strokeLinejoin="round"
               />
             </svg>
-            {t('header.back')}
+            <span className="hidden sm:inline">{t('header.back')}</span>
           </button>
 
-          <div className="h-5 w-px bg-[var(--color-border)]" />
+          <div className="hidden h-5 w-px shrink-0 bg-[var(--color-border)] sm:block" />
 
-          {/* Project info */}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-lg font-bold tracking-tight text-[var(--color-text-primary)]">
+            <h1 className="truncate text-base font-bold tracking-tight text-[var(--color-text-primary)] sm:text-lg">
               {project.name}
             </h1>
-            <p className="mt-0.5 truncate text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-0.5 line-clamp-2 text-xs text-[var(--color-text-secondary)] sm:truncate sm:text-sm">
               {project.objective}
             </p>
           </div>
 
-          {/* Stats pills */}
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden shrink-0 items-center gap-3 lg:flex">
             <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2">
               <span className="text-sm font-semibold text-[var(--color-accent)]">
                 {project.phases.length}
@@ -369,202 +367,217 @@ export default function PlanPage({
               </span>
               <span className="text-sm text-[var(--color-text-secondary)]">{t('common:breadcrumbs.plan')}</span>
             </div>
-          </div>
-
-          {/* Progress bar */}
-          {totalSteps > 0 && (
-            <div className="hidden w-28 flex-col gap-1 sm:flex">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-[var(--color-text-tertiary)]">
-                  {t('overview:stats.progress', { defaultValue: 'Progression' })}
-                </span>
-                <span className="text-xs font-semibold text-[var(--color-accent)]">
-                  {progressPct}%
-                </span>
-              </div>
-              <div className="h-2 rounded-full bg-[var(--color-surface-hover)]">
-                <div
-                  className="h-2 rounded-full bg-[var(--color-accent)] transition-all"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Chat toggle */}
-          <button
-            onClick={() => {
-              setChatOpen((v) => !v)
-              if (!chatOpen) {
-                setTimelineOpen(false)
-                setSkillsOpen(false)
-                setInsightsOpen(false)
-              }
-            }}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-              chatOpen
-                ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
-                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
-            }`}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V10C14 10.5523 13.5523 11 13 11H5L2 14V3Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="hidden md:inline">{t('panels.assistant')}</span>
-          </button>
-
-          {/* Timeline toggle */}
-          <button
-            onClick={() => {
-              setTimelineOpen((v) => !v)
-              if (!timelineOpen) {
-                setChatOpen(false)
-                setSkillsOpen(false)
-                setInsightsOpen(false)
-                setTimelineRefreshKey((k) => k + 1)
-              }
-            }}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-              timelineOpen
-                ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
-                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
-            }`}
-            title={t('panels.timelineTitle')}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
-              <path
-                d="M8 5v3l2 1.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="hidden md:inline">{t('panels.timeline')}</span>
-          </button>
-
-          {/* Skills toggle */}
-          <button
-            onClick={() => {
-              setSkillsOpen((v) => !v)
-              if (!skillsOpen) {
-                setChatOpen(false)
-                setTimelineOpen(false)
-                setInsightsOpen(false)
-              }
-            }}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-              skillsOpen
-                ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
-                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
-            }`}
-            title={t('panels.skillsTitle')}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3 8l3 3 7-7"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="hidden md:inline">{t('panels.skills')}</span>
-          </button>
-
-          {/* Insights toggle (read-only analysis agents) */}
-          <button
-            onClick={() => {
-              setInsightsOpen((v) => !v)
-              if (!insightsOpen) {
-                setChatOpen(false)
-                setTimelineOpen(false)
-                setSkillsOpen(false)
-              }
-            }}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-              insightsOpen
-                ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
-                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
-            }`}
-            title={t('panels.insightsTitle')}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M8 1.5a5.5 5.5 0 0 0-3.3 9.9V13a1 1 0 0 0 1 1h4.6a1 1 0 0 0 1-1v-1.6A5.5 5.5 0 0 0 8 1.5zM6 14.5h4"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="hidden md:inline">{t('panels.insights')}</span>
-          </button>
-
-          {/* Suggest next step */}
-          <button
-            onClick={() => {
-              // Heuristic: first in_progress step, else first not_started step
-              const flat: Step[] = []
-              for (const ph of project.phases) {
-                for (const s of ph.steps) {
-                  flat.push(s)
-                  for (const sub of s.sub_steps) flat.push(sub)
-                }
-              }
-              const next =
-                flat.find((s) => s.status === 'in_progress') ??
-                flat.find((s) => s.status === 'not_started')
-              if (next) setSelectedStep(next)
-            }}
-            className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-all hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
-            title={t('header.nextTitle')}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3 8h10m0 0L9 4m4 4l-4 4"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="hidden sm:inline">{t('header.next')}</span>
-          </button>
-
-          {/* Regenerate */}
-          <button
-            onClick={() => handleGeneratePlan()}
-            disabled={generating}
-            className="flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-black shadow-sm transition-all hover:bg-[var(--color-accent-hover)] hover:shadow-md disabled:opacity-50"
-          >
-            {generating ? (
-              <>
-                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-black/30 border-t-black" />
-                Génération…
-              </>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path
-                    d="M8 2L10.2 5.6L14 8L10.2 10.4L8 14L5.8 10.4L2 8L5.8 5.6L8 2Z"
-                    fill="currentColor"
-                    opacity="0.9"
+            {totalSteps > 0 && (
+              <div className="flex w-28 flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[var(--color-text-tertiary)]">
+                    {t('overview:stats.progress', { defaultValue: 'Progression' })}
+                  </span>
+                  <span className="text-xs font-semibold text-[var(--color-accent)]">{progressPct}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-[var(--color-surface-hover)]">
+                  <div
+                    className="h-2 rounded-full bg-[var(--color-accent)] transition-all"
+                    style={{ width: `${progressPct}%` }}
                   />
-                </svg>
-                <span className="hidden sm:inline">{t('header.regenerate')}</span>
-              </>
+                </div>
+              </div>
             )}
-          </button>
+          </div>
+        </div>
+
+        {/* Synthèse + progression — mobile / tablette uniquement */}
+        {totalSteps > 0 && (
+          <div className="px-4 pb-3 lg:hidden">
+            <div className="flex items-center justify-between gap-2 text-[11px] text-[var(--color-text-secondary)]">
+              <span className="min-w-0 truncate">
+                <span className="font-medium text-[var(--color-text-primary)]">
+                  {t('overview:stats.completed', { done: completedSteps, total: totalSteps })} ·{' '}
+                  {t('overview:stats.phases', { count: project.phases.length })}
+                </span>
+              </span>
+              <span className="shrink-0 font-semibold tabular-nums text-[var(--color-accent)]">{progressPct}%</span>
+            </div>
+            <div className="mt-2 h-1.5 rounded-full bg-[var(--color-surface-hover)]">
+              <div
+                className="h-1.5 rounded-full bg-[var(--color-accent)] transition-all"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Ligne 2 : outils — défilable horizontal sur petit écran */}
+        <div className="border-t border-[var(--color-border)]/40 bg-[var(--color-surface)]/30">
+          <div
+            className="flex gap-1.5 overflow-x-auto px-4 py-2.5 sm:gap-2 sm:px-6 sm:py-3 [scrollbar-width:thin]"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            <button
+              onClick={() => {
+                setChatOpen((v) => !v)
+                if (!chatOpen) {
+                  setTimelineOpen(false)
+                  setSkillsOpen(false)
+                  setInsightsOpen(false)
+                }
+              }}
+              title={t('panels.assistant')}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all sm:px-4 sm:py-2.5 ${
+                chatOpen
+                  ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M2 3C2 2.44772 2.44772 2 3 2H13C13.5523 2 14 2.44772 14 3V10C14 10.5523 13.5523 11 13 11H5L2 14V3Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="hidden md:inline">{t('panels.assistant')}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setTimelineOpen((v) => !v)
+                if (!timelineOpen) {
+                  setChatOpen(false)
+                  setSkillsOpen(false)
+                  setInsightsOpen(false)
+                  setTimelineRefreshKey((k) => k + 1)
+                }
+              }}
+              title={t('panels.timelineTitle')}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all sm:px-4 sm:py-2.5 ${
+                timelineOpen
+                  ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M8 5v3l2 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <span className="hidden md:inline">{t('panels.timeline')}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setSkillsOpen((v) => !v)
+                if (!skillsOpen) {
+                  setChatOpen(false)
+                  setTimelineOpen(false)
+                  setInsightsOpen(false)
+                }
+              }}
+              title={t('panels.skillsTitle')}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all sm:px-4 sm:py-2.5 ${
+                skillsOpen
+                  ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M3 8l3 3 7-7"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="hidden md:inline">{t('panels.skills')}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setInsightsOpen((v) => !v)
+                if (!insightsOpen) {
+                  setChatOpen(false)
+                  setTimelineOpen(false)
+                  setSkillsOpen(false)
+                }
+              }}
+              title={t('panels.insightsTitle')}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all sm:px-4 sm:py-2.5 ${
+                insightsOpen
+                  ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] ring-1 ring-[var(--color-accent)]/20'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M8 1.5a5.5 5.5 0 0 0-3.3 9.9V13a1 1 0 0 0 1 1h4.6a1 1 0 0 0 1-1v-1.6A5.5 5.5 0 0 0 8 1.5zM6 14.5h4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="hidden md:inline">{t('panels.insights')}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                const flat: Step[] = []
+                for (const ph of project.phases) {
+                  for (const s of ph.steps) {
+                    flat.push(s)
+                    for (const sub of s.sub_steps) flat.push(sub)
+                  }
+                }
+                const next =
+                  flat.find((s) => s.status === 'in_progress') ??
+                  flat.find((s) => s.status === 'not_started')
+                if (next) setSelectedStep(next)
+              }}
+              title={t('header.nextTitle')}
+              className="flex shrink-0 items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-all hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M3 8h10m0 0L9 4m4 4l-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="hidden sm:inline">{t('header.next')}</span>
+            </button>
+
+            <button
+              onClick={() => handleGeneratePlan()}
+              disabled={generating}
+              title={t('header.regenerate')}
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-[var(--color-accent)] px-3 py-2 text-sm font-semibold text-black shadow-sm transition-all hover:bg-[var(--color-accent-hover)] hover:shadow-md disabled:opacity-50 sm:px-5 sm:py-2.5"
+            >
+              {generating ? (
+                <>
+                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                  <span className="hidden sm:inline">Génération…</span>
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M8 2L10.2 5.6L14 8L10.2 10.4L8 14L5.8 10.4L2 8L5.8 5.6L8 2Z"
+                      fill="currentColor"
+                      opacity="0.9"
+                    />
+                  </svg>
+                  <span className="hidden sm:inline">{t('header.regenerate')}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
         <div className="border-t border-[var(--color-border)]/60 bg-[var(--color-surface)]/40">
-          <div className="flex h-9 items-center px-6">
+          <div className="flex h-9 max-w-full items-center overflow-x-auto px-4 sm:px-6 [scrollbar-width:thin]">
             <Breadcrumbs
               items={[
                 { label: t('common:breadcrumbs.projects'), to: '/' },
@@ -597,7 +610,7 @@ export default function PlanPage({
           />
           {/* Floating helper hint */}
           {!selectedStep && (
-            <div className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)]/80 px-4 py-1.5 text-[11px] font-medium text-[var(--color-text-tertiary)] backdrop-blur-md">
+            <div className="pointer-events-none absolute left-1/2 top-2 z-10 max-w-[min(22rem,calc(100vw-2rem))] -translate-x-1/2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)]/90 px-3 py-1.5 text-center text-[10px] font-medium leading-snug text-[var(--color-text-tertiary)] backdrop-blur-md sm:top-4 sm:max-w-none sm:px-4 sm:text-[11px]">
               {t('graph.hint')}
             </div>
           )}

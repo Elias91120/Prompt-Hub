@@ -316,7 +316,7 @@ export default function ChatPanel({
   return (
     <div className="flex h-full flex-col">
       {/* ── Messages ── */}
-      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
         {messages.length === 0 && (
           <div className="mx-auto mt-6 max-w-sm rounded-2xl border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]/40 p-5 text-center">
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent-glow)]">
@@ -348,7 +348,7 @@ export default function ChatPanel({
               </div>
             )}
             <div
-              className={`max-w-[80%] rounded-2xl ${msgPadding} leading-relaxed ${textSize} ${
+              className={`max-w-[min(92%,20rem)] rounded-2xl sm:max-w-[80%] ${msgPadding} leading-relaxed ${textSize} ${
                 msg.role === 'user'
                   ? 'bg-[var(--color-accent)] text-black font-medium'
                   : 'bg-[var(--color-surface-hover)] text-[var(--color-text-primary)]'
@@ -426,7 +426,7 @@ export default function ChatPanel({
 
       {/* ── Generate Plan CTA ── */}
       {readyToPlan && (
-        <div className="border-t border-[var(--color-border)] bg-[var(--color-surface-active)] px-6 py-4">
+        <div className="border-t border-[var(--color-border)] bg-[var(--color-surface-active)] px-4 py-3 sm:px-6 sm:py-4">
           <button
             type="button"
             onClick={handleGeneratePlan}
@@ -455,7 +455,7 @@ export default function ChatPanel({
       )}
 
       {/* ── Input ── */}
-      <div className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-4">
+      <div className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 sm:px-6 sm:py-4">
         <form
           onSubmit={(e) => {
             e.preventDefault()
