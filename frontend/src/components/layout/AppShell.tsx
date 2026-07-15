@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Sparkles, ArrowLeft } from 'lucide-react'
+import { Sparkles, ArrowLeft, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PageBackground from './PageBackground'
@@ -41,12 +41,20 @@ export default function AppShell({
       </a>
       <PageBackground />
 
-      {/* Beta Banner */}
-      <div className="bg-gradient-to-r from-[var(--color-surface)] via-[#15803d] to-[var(--color-surface)] px-4 py-2 text-center text-xs font-medium tracking-wide text-white shadow-md sm:text-sm">
-        <span className="mr-2 inline-block rounded-md bg-white/20 px-2 py-0.5 uppercase">Beta</span>
-        100% gratuit pour l'instant — créez un compte pour générer votre premier plan.
-        <span className="ml-2 hidden sm:inline text-white/70">
-          • Développé avec passion par <strong className="text-white">Webgen</strong>
+      {/* Beta Banner — animated gradient strip */}
+      <div className="relative overflow-hidden px-4 py-2.5 text-center text-xs font-semibold tracking-wide text-white/90 sm:text-sm" style={{background: 'linear-gradient(90deg, #070808 0%, #0a2818 20%, #15803d 50%, #083344 80%, #070808 100%)'}}>
+        {/* Animated shimmer bar */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/5 to-transparent" style={{animation: 'gradient-x 3s ease-in-out infinite', backgroundSize: '200% 100%'}} />
+        </div>
+        <span className="relative inline-flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
+            <Zap className="h-2.5 w-2.5" /> Beta
+          </span>
+          100% gratuit — créez un compte pour générer votre premier plan.
+          <span className="hidden sm:inline text-white/60">
+            · Par <strong className="text-[var(--color-accent)]">Webgen</strong>
+          </span>
         </span>
       </div>
 
@@ -69,11 +77,13 @@ export default function AppShell({
                 <span>{backLabel ?? t('actions.back')}</span>
               </button>
             ) : (
-              <Link to="/" className="flex items-center gap-2.5" aria-label={t('actions.home')}>
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[var(--color-accent-hover)] shadow-[var(--shadow-glow-sm)]">
-                  <Sparkles className="h-4 w-4 text-[#04140b]" aria-hidden />
+              <Link to="/" className="group flex items-center gap-2.5" aria-label={t('actions.home')}>
+                <span className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#4ade80] to-[var(--color-accent-hover)] shadow-[var(--shadow-glow-sm)] transition-all duration-300 group-hover:shadow-[var(--shadow-glow)]">
+                  <Sparkles className="h-4 w-4 text-[#04140b] transition-transform duration-700 group-hover:rotate-[30deg]" aria-hidden />
+                  {/* Subtle ring on hover */}
+                  <span className="absolute inset-0 rounded-xl ring-0 ring-[var(--color-accent)] transition-all duration-300 group-hover:ring-2 group-hover:ring-offset-1 group-hover:ring-offset-[var(--color-surface)]" />
                 </span>
-                <span className="text-sm font-semibold tracking-tight">
+                <span className="font-display text-sm font-semibold tracking-tight transition-colors group-hover:text-[var(--color-accent)]">
                   {t('appName')}
                 </span>
               </Link>

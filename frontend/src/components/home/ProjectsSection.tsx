@@ -66,7 +66,7 @@ export default function ProjectsSection({
             <span className="eyebrow mb-3">
               {isAuthed ? t('projects.sectionTitle') : t('projects.demoEyebrow')}
             </span>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               {isAuthed ? t('projects.sectionTitle') : t('projects.demoTitle')}
             </h2>
             <p className="mt-2 text-[var(--color-text-secondary)]">
@@ -248,7 +248,7 @@ function ProjectCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.4) }}
-      className="group glass-card-hover relative flex flex-col p-5 text-left"
+      className="group animated-border bento-card relative flex flex-col p-5 text-left"
     >
       <button
         type="button"
@@ -283,7 +283,7 @@ function ProjectCard({
         )}
       </div>
 
-      <h3 className="relative mt-4 text-sm font-semibold text-[var(--color-text-primary)]">
+      <h3 className="relative mt-4 font-display text-sm font-bold text-[var(--color-text-primary)] tracking-tight">
         {project.name}
       </h3>
       <p className="relative mt-1.5 line-clamp-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">
@@ -309,11 +309,14 @@ function ProjectCard({
               {completedSteps}/{totalSteps} étapes
             </span>
             {totalSteps > 0 && (
-              <div className="ml-auto h-1 w-14 overflow-hidden rounded-full bg-white/5">
-                <div
-                  className="h-1 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-emerald-400 transition-all"
-                  style={{ width: `${pct}%` }}
-                />
+              <div className="ml-auto flex items-center gap-1.5">
+                <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/5">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-cyan)] transition-all duration-700"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-semibold text-[var(--color-accent)]">{pct}%</span>
               </div>
             )}
           </>
